@@ -1,10 +1,14 @@
----
-title: "How to build a Serverless API in AWS without using a single lambda"
-date: 2020-03-26T15:56:00-06:00
-draft: false
-tags: ["aws", "serverless", "lambda", "dynamodb"]
-description: "Learn what is needed to build a Lambdaless API using AWS API Gateway, DynamoDB, OpenAPI and CloudFormation."
----
++++
+title = "How to build a Serverless API in AWS without using a single lambda"
+date = 2020-03-26T15:56:00-06:00
+draft = false
+tags = ["aws", "serverless", "lambda", "dynamodb"]
+[[images]]
+  src = "img/2020/03/pic01.jpg"
+  alt = "Computer Screens"
+  stretch = "stretchH"
+description = "Learn what is needed to build a Lambdaless API using AWS API Gateway, DynamoDB, OpenAPI and CloudFormation."
++++
 
 A common way people build serverless APIs is by routing an API Gateway request to an AWS Lambda. This will make another request to a different AWS Service. It often goes unnoticed that API Gateway can integrate with other AWS Services without the need of Lambda.
 
