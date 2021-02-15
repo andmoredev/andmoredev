@@ -1,0 +1,90 @@
+# For a description of these parameters, please visit the theme wiki.
+# https://github.com/pacollins/hugo-future-imperfect-slim/wiki/config.toml
+baseurl                 = "https://example.com/"
+DefaultContentLanguage  = "en"
+title                   = "AndMore Dev"
+theme                   = "hugo-future-imperfect-slim"
+paginate                = 3
+disqusShortname         = ""
+googleAnalytics         = ""
+pluralizeListTitles     = false
+disableLanguages        = []
+
+[markup.goldmark.renderer]
+  unsafe                = true
+
+[outputs]
+  home                  = ["html", "json", "rss"]
+
+[params]
+  enableCDN             = false
+  cssFiles              = ["default"]
+  jsFiles               = ["default"]
+  highlightjs           = true
+  highlightjsTheme      = ""
+  highlightjsLang       = []
+  viewMorePostsLink     = "/blog/"
+  readingTime           = true
+  imageStretch          = ""
+  removeBlur            = false
+  socialShare           = ["twitter", "linkedin", "email"]
+  hideEmptyStats        = true
+
+  [params.meta]
+    description         = "A theme by HTML5 UP, ported by Julio Pescador. Slimmed and enhanced by Patrick Collins. Multilingual by StatnMap. Powered by Hugo."
+    author              = "HTML5UP and Hugo"
+    favicon             = false
+    svg                 = true
+    faviconVersion      = "1"
+    msColor             = "#ffffff"
+    iOSColor            = "#ffffff"
+
+  [params.header]
+    navbarTitle         = "AndMore Dev"
+    dynamicTitles       = true
+    searchMenu          = true
+    shareMenu           = true
+    languageMenu        = false
+
+  [params.intro]
+    header                = "Andres Moreno"
+    paragraph             = "AWS Community Builder . Lead Engineer . Serverless Enthusiast"
+    rssIntro              = false
+    socialIntro           = true
+    hideWhenSingleColumn  = false
+    alwaysOnHomepage      = false
+
+    [params.intro.pic]
+      src                 = "img/main/logo.jpg"
+      shape               = "circle"
+      width               = ""
+      alt                 = "Andres Moreno Profile Pictrue"
+
+  [params.sidebar]
+    about               = ""
+    postAmount          = 5
+    categories          = false
+    categoriesByCount   = false
+
+  [params.footer]
+    rssFooter           = false
+    socialFooter        = false
+
+  [params.staticman]
+    enabled             = true
+    api                 = ""  # No Trailing Slash
+    gitProvider         = ""
+    username            = ""
+    repo                = ""
+    branch              = ""
+
+    [params.staticman.recaptcha]
+      siteKey           = ""
+      encryptedKey      = ""
+
+[social]
+  github                = "anmoreno"
+  stackoverflow         = "1603561"
+  medium                = "amorenom"
+  linkedin              = "andres-moreno-61997720"
+  twitter               = "ellechon"
