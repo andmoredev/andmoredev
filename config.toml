@@ -1,6 +1,6 @@
 # For a description of these parameters, please visit the theme wiki.
 # https://github.com/pacollins/hugo-future-imperfect-slim/wiki/config.toml
-baseurl                 = "https://example.com/"
+baseurl                 = "https://main.dnd16gg20lrm8.amplifyapp.com/"
 DefaultContentLanguage  = "en"
 title                   = "AndMore Dev"
 theme                   = "hugo-future-imperfect-slim"
