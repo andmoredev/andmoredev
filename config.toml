@@ -31,8 +31,8 @@ disableLanguages        = []
   hideEmptyStats        = true
 
   [params.meta]
-    description         = "A theme by HTML5 UP, ported by Julio Pescador. Slimmed and enhanced by Patrick Collins. Multilingual by StatnMap. Powered by Hugo."
-    author              = "HTML5UP and Hugo"
+    description         = ""
+    author              = ""
     favicon             = false
     svg                 = true
     faviconVersion      = "1"
@@ -71,7 +71,7 @@ disableLanguages        = []
     socialFooter        = false
 
   [params.staticman]
-    enabled             = true
+    enabled             = false
     api                 = ""  # No Trailing Slash
     gitProvider         = ""
     username            = ""
