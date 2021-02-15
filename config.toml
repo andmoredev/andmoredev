@@ -31,8 +31,8 @@ disableLanguages        = []
   hideEmptyStats        = true
 
   [params.meta]
-    description         = ""
-    author              = ""
+    description         = "Blog about cloud technologies, mostly focused on serverless"
+    author              = "Andres Moreno"
     favicon             = false
     svg                 = true
     faviconVersion      = "1"
