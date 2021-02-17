@@ -44,7 +44,7 @@ disableLanguages        = []
     dynamicTitles       = true
     searchMenu          = true
     shareMenu           = true
-    languageMenu        = false
+    languageMenu        = true
 
   [params.intro]
     header                = "Andres Moreno"
@@ -81,6 +81,19 @@ disableLanguages        = []
     [params.staticman.recaptcha]
       siteKey           = ""
       encryptedKey      = ""
+
+[Languages]
+
+  [Languages.en]
+    LanguageCode        = "en"
+    LanguageName        = "English"
+    weight              = 1
+
+  [Languages.es]
+    LanguageCode        = "es"
+    LanguageName        = "Español"
+    weight              = 2
+
 
 [social]
   github                = "anmoreno"

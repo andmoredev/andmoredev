@@ -3,11 +3,11 @@ title = "How to build a Serverless API in AWS without using a single lambda"
 date = 2020-03-26T15:56:00-06:00
 draft = false
 tags = ["aws", "serverless", "lambda", "dynamodb"]
+description = "Learn what is needed to build a Lambdaless API using AWS API Gateway, DynamoDB, OpenAPI and CloudFormation."
 [[images]]
   src = "img/2020/03/pic01.jpg"
   alt = "Computer Screens"
   stretch = "stretchH"
-description = "Learn what is needed to build a Lambdaless API using AWS API Gateway, DynamoDB, OpenAPI and CloudFormation."
 +++
 
 A common way people build serverless APIs is by routing an API Gateway request to an AWS Lambda. This will make another request to a different AWS Service. It often goes unnoticed that API Gateway can integrate with other AWS Services without the need of Lambda.
@@ -210,14 +210,14 @@ bucket.
 > Bucket names are global, if someones account already has a
 > bucket named the same way this command will fail.*
 
-2\. SAM needs to build the artifacts that are going to be deployed.. This is done by running the following SAM command:
+2\. SAM needs to build the artifacts that are going to be deployed. This is done by running the following SAM command:
 ```bash
 sam build
 ```
 This creates a folder named .aws-sam that contains the built
 artifacts.
 
-3\. With the artifacts build SAM can deploy them to the cloud.
+3\. With the artifacts built SAM can deploy them to the cloud.
 
 > *As of version v0.33.1 the sam cli introduced the capability to
 > deploy using a samconfig.toml file. You can have the sam cli
@@ -261,7 +261,7 @@ The result of the command should look like this:
 We need three pieces of information to build the URL:
 * *PhysicalResourceId* found in the stack metadata.
 * *Region* found in the *samconfig.toml file*.
-* *Stage* found in the *ProductsAPI* resource in the *Template.yaml*.
+* *Stage* found in the *ProductsAPI* resource in the *template.yaml*.
 
 ```
 https://[PhysicalResourceId].execute-api.[Region].amazonaws.com/[Stage]
