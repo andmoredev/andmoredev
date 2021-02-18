@@ -1,6 +1,6 @@
 +++
 title = "How to build a Serverless API in AWS without using a single lambda"
-date = 2020-03-26T15:56:00-06:00
+date = 2021-02-17T15:56:00-06:00
 draft = false
 tags = ["aws", "serverless", "lambda", "dynamodb"]
 description = "Learn what is needed to build a Lambdaless API using AWS API Gateway, DynamoDB, OpenAPI and CloudFormation."

@@ -3,6 +3,7 @@ title = "Deja de usar tu cuenta raíz de AWS"
 date = 2021-02-15T13:56:07-06:00
 draft = true
 description = "Enserio, ya parale! Esta es una guía para enseñarte que es lo que tienes que hacer para aumentar la seguridad de tu cuenta"
+tags = ["aws", "security", "IAM"]
 [[images]]
   src = "img/2021/02/pic03.jpg"
   alt = "Padlock"

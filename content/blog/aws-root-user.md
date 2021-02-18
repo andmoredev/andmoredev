@@ -3,6 +3,7 @@ title = "Stop using your AWS Account root user"
 date = 2021-02-15T13:56:07-06:00
 draft = true
 description = "Really, stop it! Here is a simple guide on what to do to make your account secure."
+tags = ["aws", "security", "IAM"]
 [[images]]
   src = "img/2021/02/pic03.jpg"
   alt = "Padlock"
