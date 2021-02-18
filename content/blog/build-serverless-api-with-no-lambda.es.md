@@ -1,9 +1,9 @@
 +++
-title = "Como construir un API Serverless sin un solo Lambda"
+title = "Como desarrollar un API Serverless sin un solo Lambda"
 date = 2021-02-17T15:56:00-06:00
 draft = false
 tags = ["aws", "serverless", "lambda", "dynamodb"]
-description = "Aprende lo necesario para construir un API Lambdaless usando AWS API Gateway, DynamoDB, OpenAPI y CloudFormation."
+description = "Aprende lo necesario para desarrollar un API Lambdaless usando AWS API Gateway, DynamoDB, OpenAPI y CloudFormation."
 [[images]]
   src = "img/2020/03/pic01.jpg"
   alt = "Pantallas de computadora"
@@ -277,5 +277,5 @@ Ahora puedes usar npm para exejutar tu lanzamiento:
 ```
 npm run deploy
 ```
-Ya debes entender como construir y lanzar un API REST que no require Lambdas. Y como un bonus vas a tener APIs [que se documentan solos](https://learning.postman.com/docs/postman/api-documentation/documenting-your-api/).
+Ya debes entender como desarrollar y lanzar un API REST que no require Lambdas. Y como un bonus vas a tener APIs [que se documentan solos](https://learning.postman.com/docs/postman/api-documentation/documenting-your-api/).
 Espero y les haya gustado este artículo. [Aqui](https://github.com/anmoreno/lambdaless-api/) pueden encontrar un enlace al ejemplo completo.
