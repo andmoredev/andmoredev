@@ -1,7 +1,7 @@
 +++
 title = "Deja de usar tu usuario raíz de AWS"
 date = 2021-02-22T13:56:07-06:00
-draft = true
+draft = false
 description = "Enserio, ya parale! Estas poniendo a tu cuenta en riesgo"
 tags = ["AWS", "Security", "IAM"]
 [[images]]

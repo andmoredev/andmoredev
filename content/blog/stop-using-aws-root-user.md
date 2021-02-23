@@ -1,7 +1,7 @@
 +++
 title = "Stop using your AWS Account root user"
 date = 2021-02-22T13:56:07-06:00
-draft = true
+draft = false
 description = "Really, stop it! You are putting your account at risk."
 tags = ["AWS", "Security", "IAM"]
 [[images]]
