@@ -17,7 +17,7 @@ The *root user* has access to every AWS service and resource in an account. If t
 ## Recommended settings for root user
 Since it's critical to keep the root user safe and out of reach of malicious users there are a few things you can do to increase it's security.
 
-* Do not create access keys for the root user. Create an IAM user for yourself with adminsitrative permissions
+* Do not create access keys for the root user. Create an IAM user for yourself with administrative permissions.
 * Never share the root user credentials.
 * Use a strong password. (Use a password manager if possible)
 * Enable multi-factor authentication.
@@ -42,7 +42,7 @@ Follow these steps and you will be good to go:
 2. Go to IAM Service
 3. In the users section press Add User
 4. Enter `administrator` as the username
-5. Select Programatic access and AWS Management Console access for Access Types.
+5. Select Programmatic access and AWS Management Console access for Access Types.
 6. Enter a strong password.
 7. Remove the checkbox to require a password reset and click next.
 ![Add User Details](/img/2021/02/pic01.jpg)
