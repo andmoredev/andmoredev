@@ -33,9 +33,9 @@ disableLanguages        = []
   [params.meta]
     description         = "Blog about cloud technologies, mostly focused on serverless"
     author              = "Andres Moreno"
-    favicon             = false
-    svg                 = true
-    faviconVersion      = "1"
+    favicon             = true
+    svg                 = false
+    faviconVersion      = "3"
     msColor             = "#ffffff"
     iOSColor            = "#ffffff"
 
@@ -71,12 +71,12 @@ disableLanguages        = []
     socialFooter        = false
 
   [params.staticman]
-    enabled             = false
+    enabled             = true
     api                 = ""  # No Trailing Slash
     gitProvider         = ""
     username            = ""
     repo                = ""
-    branch              = ""
+    branch              = "main"
 
     [params.staticman.recaptcha]
       siteKey           = ""
