@@ -6,7 +6,7 @@ title                   = "AndMore Dev"
 theme                   = "hugo-future-imperfect-slim"
 paginate                = 3
 disqusShortname         = ""
-googleAnalytics         = ""
+googleAnalytics         = "G-HV164KHRN5"
 pluralizeListTitles     = false
 disableLanguages        = []
 
@@ -31,7 +31,7 @@ disableLanguages        = []
   hideEmptyStats        = true
 
   [params.meta]
-    description         = "Blog about cloud technologies, mostly focused on serverless"
+    description         = "Just another blog about cloud and serverless"
     author              = "Andres Moreno"
     favicon             = true
     svg                 = false
@@ -48,7 +48,7 @@ disableLanguages        = []
 
   [params.intro]
     header                = "Andres Moreno"
-    paragraph             = "AWS Community Builder . Lead Engineer . Serverless Enthusiast"
+    paragraph             = "Hi, I'm Andres Moreno, Lead Software Engineer at Tyler Technologies. I started this site to share what I've learned around cloud and serverless in english and spanish."
     rssIntro              = false
     socialIntro           = true
     hideWhenSingleColumn  = false
@@ -93,7 +93,6 @@ disableLanguages        = []
     LanguageCode        = "es"
     LanguageName        = "Español"
     weight              = 2
-
 
 [social]
   github                = "anmoreno"
