@@ -48,7 +48,7 @@ disableLanguages        = []
 
   [params.intro]
     header                = "Andres Moreno"
-    paragraph             = "Hi, I'm Andres Moreno, Lead Software Engineer at Tyler Technologies. I started this site to share what I've learned around cloud and serverless in english and spanish."
+    paragraph             = "I'm Andres Moreno, Lead Software Engineer at Tyler Technologies. I focus on serverless techonology in AWS"
     rssIntro              = false
     socialIntro           = true
     hideWhenSingleColumn  = false
