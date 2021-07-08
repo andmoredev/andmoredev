@@ -27,7 +27,7 @@ This article will show you what you need to be able to do this without going int
 ---
 
 # Let's get started
-[Link to example](https://github.com/anmoreno/lambdaless-api/)
+[Link to example](https://github.com/andmoredev/lambdaless-api/)
 
 The example shows how to create a Products Service that will Create, Read, Update and Delete (CRUD) products from the database.
 
@@ -110,7 +110,7 @@ A simple way to define your API endpoints is by using the [Open API Specificatio
 
 CloudFormation will create the API by using what you already defined using OpenAPI. You have to use Amazon's [custom OAS extensions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-api-gateway-extensions.html), to be able to set your VTL I/O mappings.
 
-[This Open API Specification example](https://github.com/anmoreno/lambdaless-api/blob/master/products-openapi.yaml) shows the definition of 5 RESTful endpoints. I will be highlighting several parts of this file to better understand what is happening.
+[This Open API Specification example](https://github.com/andmoredev/lambdaless-api/blob/master/products-openapi.yaml) shows the definition of 5 RESTful endpoints. I will be highlighting several parts of this file to better understand what is happening.
 First you have the paths, each path will then have each of the operations that it will run: GET, POST, PUT, DELETE.
 In the example API we have two paths:
 
@@ -273,7 +273,7 @@ https://mx266abc0g.execute-api.us-east-1.amazonaws.com/Lambdaless
 ```
 
 You can use a tool like Postman to make requests to your API. All you have to do is append the path as defined in the OAS file as well as the necessary *parameters* and *body*.
-I included a [Postman collection](https://github.com/anmoreno/lambdaless-api/blob/master/Products.postman_collection.json) in the example that can be imported to view how the requests look.
+I included a [Postman collection](https://github.com/andmoredev/lambdaless-api/blob/master/Products.postman_collection.json) in the example that can be imported to view how the requests look.
 # Bonus
 To simplify deployments I included a *package.json* file. The file has an *npm script* that will take care of executing the deployment commands.
 The script looks like this:
@@ -285,4 +285,4 @@ Now you can use npm run to execute the deployment:
 npm run deploy
 ```
 By now you should understand how to build and deploy a Lambdaless REST API. As a bonus you get [self documenting APIs by using OAS with Postman](https://learning.postman.com/docs/postman/api-documentation/documenting-your-api/).
-I hope you have enjoyed this. You can find a link to the full example [here](https://github.com/anmoreno/lambdaless-api/)
+I hope you have enjoyed this. You can find a link to the full example [here](https://github.com/andmoredev/lambdaless-api/)
