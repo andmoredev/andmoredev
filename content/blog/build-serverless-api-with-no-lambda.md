@@ -69,7 +69,7 @@ The resources needed for the service to work are the following:
           'Fn::Transform':
             Name: AWS::Include
             Parameters:
-              Location: 's3://[YOUR_BUCKET_NAME]/products-api-open-api-definition.yaml'
+              Location: ./products-openapi.yaml
 ```
 
 * **Role** - Role that gives API Gateway the permissions needed to be able to run DynamoDB actions.
@@ -196,28 +196,14 @@ There are a lot more things that can be done with Open API and Amazon API Gatewa
 # Deploy the Service to AWS
 As I mentioned before this is all done without touching the AWS console. To get the application deployed to AWS there are a few things that need to happen:
 
-1\. The latest version of the Open API Specification file needs to be copied into an S3 bucket.
-```bash
-aws s3api create-bucket --bucket [BUCKET-NAME]
-aws s3 cp ./products-openapi.yaml s3://[BUCKET-NAME]/
-```
-
-The first command will create the S3 bucket where the Open API
-file will live. The second command copies the file into the S3
-bucket.
-
-> *[BUCKET-NAME] should be replaced with a unique bucket name.
-> Bucket names are global, if someones account already has a
-> bucket named the same way this command will fail.*
-
-2\. SAM needs to build the artifacts that are going to be deployed. This is done by running the following SAM command:
+1\. SAM needs to build the artifacts that are going to be deployed. This is done by running the following SAM command:
 ```bash
 sam build
 ```
 This creates a folder named .aws-sam that contains the built
 artifacts.
 
-3\. With the artifacts built SAM can deploy them to the cloud.
+2\. With the artifacts built SAM can deploy them to the cloud.
 
 > *As of version v0.33.1 the sam cli introduced the capability to
 > deploy using a samconfig.toml file. You can have the sam cli
@@ -232,45 +218,20 @@ the config file. Everything will be available to test once the
 script is done.
 
 # How to test the API
-To test this we need the deployed APIs URL. The easiest way to get the URL is by going into API Gateway in the AWS Console. But I promised that we would do everything without going into the console. The solution to this is by using the [aws cli](https://aws.amazon.com/cli/).
-For security reasons the APIs URL is not accessible by calling an endpoint, which means we need to build it by hand.
-The Cloudformation Stack metadata contains one of the pieces needed to build the URL. The metadata is retrieved by executing the following command:
-```bash
-aws cloudformation describe-stack-resources --stack-name products-service --logical-resource-id ProductsAPI
-```
-You can find the *stack-name* in *samconfig.toml* file. The *logical-resource-id* is the name that you used for our API in the *template.yaml*.
-The result of the command should look like this:
-```json
-{
-    "StackResources": [
-        {
-            "StackName": "products-service",
-            "StackId": "arn:aws:cloudformation:us-east-1:1234567890:stack/products-service/12345678-9a01-23bc-efgh-1j3kl984m932",
-            "LogicalResourceId": "ProductsAPI",
-            "PhysicalResourceId": "mx266abc0g",
-            "ResourceType": "AWS::ApiGateway::RestApi",
-            "Timestamp": "2020-03-24T02:31:27.542Z",
-            "ResourceStatus": "UPDATE_COMPLETE",
-            "DriftInformation": {
-                "StackResourceDriftStatus": "NOT_CHECKED"
-            }
-        }
-    ]
-}
-```
-We need three pieces of information to build the URL:
-* *PhysicalResourceId* found in the stack metadata.
-* *Region* found in the *samconfig.toml file*.
-* *Stage* found in the *ProductsAPI* resource in the *template.yaml*.
+To test this we need the deployed APIs URL.
 
-```
-https://[PhysicalResourceId].execute-api.[Region].amazonaws.com/[Stage]
+For security reasons the APIs URL is not accessible by calling an endpoint, which means we need to build it ourselves with information we already have in the template. We are going to join several values to build the URL and ouptut it.
+
+It ends up looking like this:
+
+```yaml
+Outputs:
+  ProductsURL:
+    Description: Products URL
+    Value: !Join [ '', [ 'https://', !Ref ProductsAPI, '.execute-api.', !Sub '${AWS::Region}', '.amazonaws.com/Lambdaless' ] ]
 ```
 
-In the example it looks like this:
-```
-https://mx266abc0g.execute-api.us-east-1.amazonaws.com/Lambdaless
-```
+Whenever you run a deployment you will be able to get this value from the terminal.
 
 You can use a tool like Postman to make requests to your API. All you have to do is append the path as defined in the OAS file as well as the necessary *parameters* and *body*.
 I included a [Postman collection](https://github.com/andmoredev/lambdaless-api/blob/master/Products.postman_collection.json) in the example that can be imported to view how the requests look.
@@ -278,7 +239,7 @@ I included a [Postman collection](https://github.com/andmoredev/lambdaless-api/b
 To simplify deployments I included a *package.json* file. The file has an *npm script* that will take care of executing the deployment commands.
 The script looks like this:
 ```bash
-"deploy": "aws s3api create-bucket - bucket [BUCKET-NAME] && aws s3 cp ./products-api-open-api-definition.yaml s3://[BUCKET-NAME]/ && sam build && sam deploy"
+"deploy": "sam build && sam deploy"
 ```
 Now you can use npm run to execute the deployment:
 ```

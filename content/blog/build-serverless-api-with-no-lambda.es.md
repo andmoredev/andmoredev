@@ -69,7 +69,7 @@ Los recursos que necesitamos para que el servicio funcione son los siguientes:
           'Fn::Transform':
             Name: AWS::Include
             Parameters:
-              Location: 's3://[NOMBRE-DE-BUCKET]/products-api-open-api-definition.yaml'
+              Location: ./products-openapi.yaml
 ```
 
 * **Role** - Rol que le da al API Gateway los permisos necesarios para poder realizar acciones contra DynamoDB.
@@ -195,23 +195,13 @@ Hay muchas otras cosas que se pueden hacer utilizando OpenAPI y Extensiones de A
 # Desplegar el Servicio en AWS
 Como les había mencionado anteriormente todo esto lo estamos haciendo sin usar la consola de AWS. Para desplegar la aplicación a AWS hay unas cosas que tenemos que realizar primero:
 
-1\. Tenemos que copiar la versión mas reciente de nuestro archivo que contiene la Specificación Open API un bucket S3.
-```bash
-aws s3api create-bucket --bucket [NOMBRE-DE-BUCKET]
-aws s3 cp ./products-openapi.yaml s3://[NOMBRE-DE-BUCKET]/
-```
-
-El primer comando va a crear el bucket en S3 donde nuestro archivo OpenAPI va a vivir. El segundo comando copia el archivo a ese bucket.
-
-> *[NOMBRE-DE-BUCKET] debe ser reemplazado con un nombre único. Los nombres de Buckets son globales, si alguna otra cuenta tiene un bucket con ese mismo nombre, este comando va a fallar.*
-
-2\. SAM necesita construir los artefactos que van a ser desplegados. Esto se hace corriendo el siguiente commando:
+1\. SAM necesita construir los artefactos que van a ser desplegados. Esto se hace corriendo el siguiente commando:
 ```bash
 sam build
 ```
 Esto va a crear un folder llamado *.aws-sam* que contiene los artefactos.
 
-3\. Con los artefactos construidos SAM ahora puede desplegarlos a la nube.
+2\. Con los artefactos construidos SAM ahora puede desplegarlos a la nube.
 
 > *Desde la version v0.33.1 sam cli introdujo la habilidad de desplegar usando un archivo llamado samconfig.toml. Puedes hacer que el cli genere este archivo corriendo sam deploy en modo guiado*.
 
@@ -222,47 +212,19 @@ sam deploy --guided
 Esto te va a hacer varias preguntas simples para poder hacer las configuraciones necesarias en el archivo. Todo va a estar listo para ponerlo a la prueba cuando termine de correr.
 
 # Como probar el API
-Para poder revisar que todo se instaló correctamente necesitamos conseguir la liga del API. La manera más fácil de hacer esto es iendo al servicio de API Gateway en la consola de AWS. Pero les había prometido que no ibamos a usar la consola.
-Entonces esto lo debemos hacer usando el [aws cli](https://aws.amazon.com/cli/).
-Por razones de seguridad los URL de los APIs no son accesibles haciendo una llamada a un punto de enlace en AWS, por lo que lo vamos a tener que construir a mano.
+Para poder revisar que todo se instaló correctamente necesitamos conseguir la liga del API.
+Por razones de seguridad los URL de los APIs no son accesibles haciendo una llamada a un punto de enlace en AWS, por lo que lo vamos a tener que construir a mano con información que ya tenemos de la plantilla de SAM. Vamos a juntar varios valores usando un Join de esta manera construyendo el enlace y agregandolo como parametero de salida.
 
-Los metadatos de la pila (stack) de CloudFormation contiene una de las piezas que necesitamos para construir este enlace. Los metadatos pueden ser adquiridos ejecutando este comando:
-```bash
-aws cloudformation describe-stack-resources --stack-name products-service --logical-resource-id ProductsAPI
-```
-Puedes encontrar el *stack-name* en el archivo *samconfig.toml*. El *logical-resource-id* es el nombre que le diste a tu API en el *template.yaml*.
-El resultado del comando debe verse asi:
-```json
-{
-    "StackResources": [
-        {
-            "StackName": "products-service",
-            "StackId": "arn:aws:cloudformation:us-east-1:1234567890:stack/products-service/12345678-9a01-23bc-efgh-1j3kl984m932",
-            "LogicalResourceId": "ProductsAPI",
-            "PhysicalResourceId": "mx266abc0g",
-            "ResourceType": "AWS::ApiGateway::RestApi",
-            "Timestamp": "2020-03-24T02:31:27.542Z",
-            "ResourceStatus": "UPDATE_COMPLETE",
-            "DriftInformation": {
-                "StackResourceDriftStatus": "NOT_CHECKED"
-            }
-        }
-    ]
-}
-```
-Necesitamos tres piezas de información para construir el enlace:
-* *PhysicalResourceId* encontrado en los metadatos de la pila.
-* *Region* se puede encontrar en el  *archivo samconfig.toml*.
-* *Stage* está en el recurso *ProductsAPI* en el *template.yaml*.
+Se ve así:
 
-```
-https://[PhysicalResourceId].execute-api.[Region].amazonaws.com/[Stage]
+```yaml
+Outputs:
+  ProductsURL:
+    Description: Products URL
+    Value: !Join [ '', [ 'https://', !Ref ProductsAPI, '.execute-api.', !Sub '${AWS::Region}', '.amazonaws.com/Lambdaless' ] ]
 ```
 
-En nuestro ejemplo se vería así:
-```
-https://mx266abc0g.execute-api.us-east-1.amazonaws.com/Lambdaless
-```
+Cuando corras tu siguiente despliegue veras este valor en tu terminal cuando termine.
 
 Puedes utilizar una herramienta como Postman para hacer peticiones a tu API. Todo lo que tienes que hacer es agregar la ruta que definiste en el archivo OAS asi como proveer los parametros y cuerpo necesarios en *parameters* y *body*.
 Incluí una [colección de Postman](https://github.com/andmoredev/lambdaless-api/blob/master/Products.postman_collection.json) en el ejemplo para poder importarlo y ver como se ven las peticiones.
