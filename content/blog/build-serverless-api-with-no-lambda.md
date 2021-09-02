@@ -48,7 +48,6 @@ The resources needed for the service to work are the following:
   ProductsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: products
       KeySchema:
         - AttributeName: pk
           KeyType: HASH
