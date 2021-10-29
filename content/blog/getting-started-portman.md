@@ -1,7 +1,7 @@
 +++
 title = "Get better API testing by using Portman"
 date =  2021-10-28T19:41:28-05:00
-draft = false
+draft = true
 description = "Automate your API tests by using your OpenAPI definitions."
 tags = ["AWS", "OpenAPI", "Test"]
 [[images]]

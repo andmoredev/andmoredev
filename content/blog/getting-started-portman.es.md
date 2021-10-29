@@ -1,7 +1,7 @@
 +++
 title = "Hax mejor pruebas de tu API usando Portman"
 date =  2021-10-28T19:41:28-05:00
-draft = false
+draft = true
 description = "Automatiza las pruebas de tu API utilizando tu definición de OpenAPI."
 tags = ["AWS", "OpenAPI", "Test"]
 [[images]]
