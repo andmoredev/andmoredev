@@ -229,6 +229,12 @@ input[type="button"],
     .button:hover:active {
       background-color: rgba(46, 184, 172, 0.05); }
 
+button[type="button"],
+button[type="reset"] {
+  width: 100%;
+  margin: 0.25em 0;
+  padding: 0 1em; }
+
 label {
   color: #3b3a3a;
   display: block;
@@ -1391,6 +1397,14 @@ figcaption {
   .reddit::before {
     font-family: "Font Awesome 5 Brands";
     content: ""; }
+
+.vk {
+  background-color: #5181b8; }
+  .vk:hover {
+    background-color: #3e6898; }
+  .vk::before {
+    font-family: "Font Awesome 5 Brands";
+    content: ""; }
 
 .email {
   background-color: #454545;
