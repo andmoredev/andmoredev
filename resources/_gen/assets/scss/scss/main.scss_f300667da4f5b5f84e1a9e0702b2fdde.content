@@ -222,7 +222,7 @@ input[type="button"],
   input[type="button"]:hover,
   .button:hover {
     border: 1px solid #2eb8ac;
-    color: #2eb8ac !important; }
+    color: #2eb8ac; }
     input[type="submit"]:hover:active,
     input[type="reset"]:hover:active,
     input[type="button"]:hover:active,
@@ -1055,7 +1055,7 @@ figcaption {
   border: 0;
   transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
   #back-to-top:hover {
-    color: #2eb8ac !important;
+    color: #2eb8ac;
     transform: translateY(-10px); }
 
 #socnet-share {
@@ -1098,6 +1098,12 @@ figcaption {
       padding: 0 2.5em; } }
   #wrapper.overlay {
     opacity: 0.25; }
+
+#TableOfContents {
+  border: 1px dotted rgba(161, 161, 161, 0.7); }
+  #TableOfContents ul {
+    list-style-type: none;
+    padding-inline-start: 1.5em; }
 
 /* ==========================================================================
    Add-Ons
