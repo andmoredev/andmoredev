@@ -1,7 +1,7 @@
 +++
 title = "Add Authentication to Portman API tests"
 date = 2022-03-24T16:18:15-06:00
-draft = true
+draft = false
 description = "Testing secure APIs through automation can be a pain. Thankfully Portman provides an easy way to include authentication in your test automation."
 tags = [ "API", "OpenAPI", "Test" ]
 [[images]]
