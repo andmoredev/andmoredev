@@ -94,7 +94,7 @@ We will be updating ours to include an overwrite for the apiKey.
 }
 ```
 
-Now if we run Portman we wll get a successful run just as we did prior to adding security to the API.
+Now if we run Portman we will get a successful run just as we did prior to adding security to the API.
 
 # Recap
 In this post we successfully tested a secure API using Portman by
