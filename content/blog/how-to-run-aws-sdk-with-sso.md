@@ -1,28 +1,28 @@
 +++
-title = "How to run AWS SDK locally when using AWS SSO"
-date = 2023-01-27T00:00:00Z
-draft = true
-description = "Find out the different ways you can leverage AWS SSO to run code using the AWS SDK"
+title = "Running AWS SDK locally"
+date = 2023-01-31T00:00:00Z
+draft = false
+description = "Lear how to setup locally to run the AWS SDK using SSO and named profiles"
 tags = ["AWS", "SDK", "IAM", "SSO"]
 [[images]]
   src = "img/how-to-run-aws-sdk-with-sso/01.jpg"
   alt = "Engineers working in laptops"
   stretch = "stretchH"
 +++
-When using Access Keys I got used to setting the default profile in my credentials file and it all just worked. When I began having to manage more accounts and switched to SSO updating the default profile becomes more of a pain. I will show a couple of ways you can easily authenticate the SDK when using named profiles.
+When using Access Keys I got used to setting the default profile in my credentials file and it worked just fine. When I began having to manage more accounts and switched to SSO, updating the default profile becomes more of a pain. I will show you a couple of ways to authenticate the SDK using named profiles.
 
-We will be walking through the steps to authenticate the AWS SDK against a specific AWS Account using the following methods:
-1. Setting Environment Variables
-2. Getting Credentials in the code.
+I will be showing how to authenticate the AWS SDK against a specific AWS Account using the following methods:
+1. Setting environment variables
+2. Getting credentials in the code.
 
-## Setting Environment Variables
+## Setting environment variables
 The easiest way you can run the AWS SDK from your local machine is by setting the AWS_PROFILE environment variable (if not set it will default to the *default* profile).
 
-In your terminal you can set the AWS_PROFILE environment variable so that when the SDK is used it will find the profile from the `~/.aws/config` file and use those credentials. In our case using AWS SSO you will have to be logged in by running `aws sso login --profile my-profile`
+In your terminal you can set the AWS_PROFILE environment variable so the SDK can find the profile from the `~/.aws/config` file and use those values. When using AWS SSO you will need to log in by running `aws sso login --profile my-profile`
 
 *I couldn't get it to use the default region from the *config* file, so you will also have to set the AWS_REGION environment variable to make this work.*
 
-**How do you set Environment Variables?**  
+**How do you set environment variables?**  
 Linux/macOS
 ```powershell
 $ export AWS_PROFILE=my-profile
@@ -39,21 +39,21 @@ C:\> setx AWS_PROFILE my-profile
 C:\> setx AWS_REGION us-east-1
 ```
 
-While being authenticated via SSO and having the necessary environment variables setup you can instantiate the client as shown below.
+You can now use any client by initializing it as shown below.
 ```javascript
   const { SecretsManagerClient } = require('@aws-sdk/client-secrets-manager');
   const secretsManagerClient = new SecretsManagerClient();
 ```
 
-There are more Environment Variables that you can set in you terminal but as I mentioned, you can simplify your local execution by using the profile setup.
+There are more environment variables that you can set in you terminal to accomplish different things, but I wasn't able to find a consolidated list of the ones that are available to use.
 
-## Getting Credentials in code
-Another way to provide the credentials to the SDK is by using the **credentials-provider** class from the SDK. This requires your code to be aware of any parameters you need to set.  
-To make this work the same way as the Environment Variable route you will need to provide the *profile* as an input to your code.
+## Getting credentials in code
+Another way to provide the credentials to the SDK is by using the **credentials-provider** class. This requires your code to be aware of any parameters you need to set.  
+To make this work the same way as the environment variable route you will need to provide the *profile* as an input in your code.
 
-As with the Environment Variables, I couldn't get it to use the default region set in the *config* file so you will also need to provide the region as an input.
+*As with the environment variables, I couldn't get it to use the default region set in the *config* file so you will also need to provide the region as an input.*
 
-Once you are signed in to a specific profile by doing `aws sso login --profile my-profile`, you can get the credentials using the `credential-providers` package as shown below. If using the *default* you can start the clients the same way as with Environment Variables.
+Once you signed in to a specific profile by doing `aws sso login --profile my-profile`, you can get the credentials using the `credential-providers` package as shown below (If using the *default* profile you can start the client the same way than with environment variables)
 
 ```javascript 
   const { SecretsManagerClient } = require('@aws-sdk/client-secrets-manager');
@@ -63,7 +63,7 @@ Once you are signed in to a specific profile by doing `aws sso login --profile m
   })();
 ```
 
-Now with the AwsCredentialIdentityProvider object you can instantiate any client by providing the **credentials** and the **region**, like this:
+With the AwsCredentialIdentityProvider object you can initialize any client by providing the **credentials** and the **region** as shown below:
 ```javascript
   const secretsManagerClient = new SecretsManagerClient({
     credentials: credentials,
@@ -72,5 +72,6 @@ Now with the AwsCredentialIdentityProvider object you can instantiate any client
 ```
 
 ## Conclusion
-Running the SDK from a local machine can come in handy for development so being able to properly and securely authenticate is very important.  
-We went through a couple of ways you can authenticate code that is being executed locally, there are other ways you can authenticate, so if these options do not work for you do to organization security policies I recommend looking into the documentation or reach out to the community to find which one fits you best.
+Running the SDK from your local machine is very important and valuable to be able to provide tooling and improve your developers experience.  
+We went through some of the ways you can authenticate code that is being executed locally when you have several profiles  .
+There are other ways you can authenticate, so if these options do not work for you do to organization security policies or any other reason, I recommend looking into the documentation or reach out to the community to find which one fits you best.
