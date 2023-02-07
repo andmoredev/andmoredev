@@ -19,6 +19,7 @@ I will be showing how to authenticate the AWS SDK against a specific AWS Account
 The easiest way you can run the AWS SDK from your local machine is by setting the AWS_PROFILE environment variable (if not set it will default to the *default* profile).
 
 In your terminal you can set the AWS_PROFILE environment variable so the SDK can find the profile from the `~/.aws/config` file and use those values. When using AWS SSO you will need to log in by running `aws sso login --profile my-profile`
+Look at [this Ben Kehoe's post](https://ben11kehoe.medium.com/you-only-need-to-call-aws-sso-login-once-for-all-your-profiles-41a334e1b37e) for an explanation on how this command works.
 
 **How do you set environment variables?**  
 Linux/macOS
@@ -49,7 +50,7 @@ There are more environment variables that you can set in you terminal to accompl
 Another way to provide the credentials to the SDK is by using the **credentials-provider** class. This requires your code to be aware of any parameters you need to set.  
 To make this work the same way as the environment variable route you will need to provide the *profile* as an input in your code.
 
-Once you signed in to a specific profile by doing `aws sso login --profile my-profile`, you can get the credentials using the `credential-providers` package as shown below (if using the *default* profile you can start the client the same way than with environment variables)
+Once you are signed in to your SSO with `aws sso login --profile my-profile`, you can get the credentials using the `credential-providers` package as shown below (If using the *default* profile you can start the client the same way than with environment variables)
 
 ```javascript 
   const { SecretsManagerClient } = require('@aws-sdk/client-secrets-manager');
