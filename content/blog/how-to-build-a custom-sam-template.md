@@ -1,7 +1,7 @@
 +++
 title = "Speed up new serverless application development with SAM customized templates"
-date = 2023-02-01T00:00:00Z
-draft = true
+date = 2023-07-01T00:00:00Z
+draft = false
 description = "Learn how you can use custom templates with SAM to speed up initial application setup."
 tags = ["AWS", "Serverless", "SAM"]
 [[images]]
