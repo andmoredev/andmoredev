@@ -27,7 +27,7 @@ Since SAM uses cookiecutter to generate a project you can use any of the capabil
 ## 1. Create project structure
 You have to give your project the necessary folder structure, as well as include any files needed within these folders. Usually you already have a project in place that you want to model from when creating a template, you can simply copy all of the files and folders from that existing project into your template project.
 
-## 2. Identify repleaceable values
+## 2. Identify replaceable values
 Now you need to identify what values you need to be entered by the person that will be initializing the project. These are things that will vary from project to project. For example, if you are working with a serverless API you could provide values for DynamoDB table name, API stage name, Stack Name, Lambda Function Runtime.  
 With the attributes identified you will now replace what you currently have with something that looks like this `{{ cookiecutter.project_name }}`, this is what cookiecutter will be scanning for to be able to replace the values with the users input. This format can be applied to any spot within a file as well as for any folder or file names.
 
