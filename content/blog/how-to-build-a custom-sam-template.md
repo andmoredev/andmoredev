@@ -25,7 +25,7 @@ Once you have a template selected it will use cookiecutter to prompt the user fo
 Since SAM uses cookiecutter to generate a project you can use any of the capabilities described in their [documentation](https://cookiecutter.readthedocs.io/en/2.0.2/)
 
 ## 1. Create project structure
-You have to give your project the necessary folder structure, as well as include any files needed within these folders. Usually you already have a project in place when creating a template, you can simply copy all of the files and folders from that existing project into your template project.
+You have to give your project the necessary folder structure, as well as include any files needed within these folders. Usually you already have a project in place that you want to model from when creating a template, you can simply copy all of the files and folders from that existing project into your template project.
 
 ## 2. Identify repleaceable values
 Now you need to identify what values you need to be entered by the person that will be initializing the project. These are things that will vary from project to project. For example, if you are working with a serverless API you could provide values for DynamoDB table name, API stage name, Stack Name, Lambda Function Runtime.  
