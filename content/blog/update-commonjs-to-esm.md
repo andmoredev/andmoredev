@@ -1,7 +1,7 @@
 +++
 title = "How to update Lambda Functions from Common JS to ECMAScript"
 date = 2023-12-11T00:00:00-00:00
-draft = true
+draft = false
 description = "Follow these 3 steps to update your Common JS Lambda Functions to ECMAScript Modules (ESM)"
 tags = ["AWS", "Serverless"]
 [[images]]
