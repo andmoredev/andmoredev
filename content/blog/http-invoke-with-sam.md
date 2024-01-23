@@ -1,8 +1,8 @@
 +++
-title = "Call APIs from Step Functions with SAM"
+title = "Call APIs from Step Functions using SAM"
 date = 2024-01-23T00:00:00-00:00
-draft = true
-description = "Learn the necessary steps to trigger the HTTP endpoint task state from a Step Function to be able to eliminate the Lambda Functions you have to call APIs"
+draft = false
+description = "Learn what's needed to trigger the HTTP endpoint task state from a Step Function to be able to eliminate the Lambda Functions you have to call APIs"
 tags = ["AWS", "Serverless"]
 [[images]]
   src = "img/http-invoke-with-sam/title.png"
@@ -43,7 +43,7 @@ OpenWeatherConnection:
 There are several permissions needed to execute an endpoint using the HTTP task.
 1. It needs access to the secret that the EventBridge Connection creates in Secrets Manager.
 2. Permission to retrieve the connection credentials from the EventBridge Connection.
-3. Permission to execute the InvokeHTTPEndpoint, in this case the resource needs to be the ARN of the state machine that is executing it. To avoid a cyclical dependency in SAM we are parsing the ARN ourselves. I'm adding a wildcard at the end to account for the unique identifier that AWS adds to the end of generated resource names.  We are also restricting the HTTP Invocation to only allow a GET to the OpenWeather API Base URL.
+3. Permission to execute the InvokeHTTPEndpoint. In this case the resource needs to be the ARN of the state machine that is executing it. To avoid a cyclical dependency in SAM we are parsing the ARN ourselves. I'm adding a wildcard at the end to account for the unique identifier that AWS adds to the end of generated resource names.  We are also restricting the HTTP Invocation to only allow a GET to the OpenWeather API.
 
 ```yaml
 Policies:
