@@ -1,28 +1,27 @@
 +++
 title = "Call third-party endpoints from Step Functions with SAM"
-date = 2024-01-01T00:00:00-00:00
+date = 2024-01-23T00:00:00-00:00
 draft = true
-description = ""
+description = "Follow these 3 steps to call the HTTP Task in Step Functions using SAM"
 tags = ["AWS", "Serverless"]
 [[images]]
-  src = "img/layerless-esbuild-lambda/title.png"
-  alt = "Image of a person removing a jacket into a stack of other jackets the person has already removed"
+  src = "img/http-invoke-with-sam/title.png"
+  alt = "Image of a diagram in excalibur showing a Step Function calling a Lambda Function and the Lambda Function calling out to the Internet with the Lambda Function crossed out"
   stretch = "stretchH"
 +++
 
-# Call third-party endpoints from Step Functions with SAM
-
 [Benoit Boure](https://twitter.com/Benoit_Boure) wrote an article last week on [Calling External Endpoints With Step Functions and the CDK](https://benoitboure.com/calling-external-endpoints-with-step-functions-and-the-cdk), but if you know me I love SAM and wanted to show the same setup but instead of using CDK we will be using SAM.
 
-I will not go into the details of what it does since Benoit did a great job of explaining that in the post I mentioned above, we will simply be going through the things needed to successfully add this integration to your Step Functions.
+I will not go into the details of how it works since Benoit did a great job of explaining that in the post mentioned above. 
 
-For this example we will be using the [OpenWeather API](https://openweathermap.org/api) to check the temperature of the provided location and based on the response it will tell us if we need to wear a warm jacket, light jacket or no jacket.
-
-Below is the state machine workflow diagram that we will be executing.  
+We'll be using the [OpenWeather API](https://openweathermap.org/api) to check the temperature of a location and check if we need to wear a warm jacket, light jacket or no jacket. Below is the state machine workflow diagram that we will be executing.  
 ![Step function diagram](/img/http-invoke-with-sam/stepfunction-diagram.png)
 
+ [Link to complete example on GitHub](https://github.com/andmoredev/http-invoke-with-sam)
+
+# Steps to follow  
 ## 1. Create EventBridge Connection
-The HTTP task uses an EventBridge Connection to authenticate the request. For the OpenWeather API we need to provide the API Key as a query parameter and not as an Authorization header as you would typically see on other APIs. To accomplish this we add the InvocationHttParameters where we tell it to add the query string parameter of *appid* to the request.
+The HTTP task uses an EventBridge Connection to authenticate the request. For the OpenWeather API we need to provide the API Key as a query parameter and not as an Authorization header as you would typically do on other APIs. To accomplish this we add the *InvocationHttParameters* object where we add the query string parameter to the request with the name appid.
 
 ```yaml
 OpenWeatherConnection:
@@ -42,9 +41,9 @@ OpenWeatherConnection:
 ```
 ## 2. Create Step Function Execution Policy
 There are several permissions needed to successfully execute an endpoint using the HTTP task.
-1. Access to the secret that the EventBridge Connection created in Secrets Manager.
+1. It needs access to the secret that the EventBridge Connection creates in Secrets Manager.
 2. Permission to retrieve the connection credentials from the EventBridge Connection.
-3. Permission to execute the InvokeHTTPEndpoint, in this case the resource needs to be the ARN of the state machine that is executing it. To avoid a cyclical dependency in SAM we are manually creating the ARN, we are adding a wildcard at the end to account for the unique identifier that AWS adds to the resource name.  We are also restricting the HTTP Invocation to only be allowed for a GET to the OpenWeather API Base URL.
+3. Permission to execute the InvokeHTTPEndpoint, in this case the resource needs to be the ARN of the state machine that is executing it. To avoid a cyclical dependency in SAM we are manually parsing the ARN. I'm adding a wildcard at the end to account for the unique identifier that AWS adds to the end of generated resource names.  We are also restricting the HTTP Invocation to only be allowed for a GET to the OpenWeather API Base URL.
 
 ```yaml
 Policies:
@@ -69,9 +68,9 @@ Policies:
           StringLike:
             states:HTTPEndpoint: !Ref OpenWeatherBaseUrl
 ```
-## 3. Calling the HTTP Invoke State
+## 3. Calling endpoint from the Step Function
 With all that in place we can now add the step to our state machine as shown below.  
-We are specifying the GET method, the connection ARN to our EventBridge Connection that we created, pointing it to the correct OpenWeather URL and then providing the latitude and longitude of the location we would like to get the temperature from.
+We are specifying the HTTP method as GET, the connection ARN to our EventBridge Connection as the authentication, OpenWeather base URL and we are appending query parameters to get the temperature of the location and the units we want.
 ```json
 "Get Temperature": {
   "Type": "Task",
@@ -94,4 +93,5 @@ We are specifying the GET method, the connection ARN to our EventBridge Connecti
 }
 ```
 
-You can find the complete example on [this github repository](https://github.com/andmoredev/http-invoke-with-sam).
+# Wrap Up
+As you can see it is not that complicated to replace any Lambda Functions you have to call third party endpoints. The permissions can get a little bit complicated but once you undrestand them you can simply repeat them for other requests you need to do.
