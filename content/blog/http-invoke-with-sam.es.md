@@ -1,8 +1,8 @@
 +++
-title = "Llamar a endpoints de terceros desde Step Functions con SAM"
+title = "Llamar APIs desde Step Functions con SAM"
 date = 2024-01-23T00:00:00-00:00
 draft = true
-description = "Sigue estos 3 pasos para hacer llamadas a APIs externos usando Step Functions y SAM"
+description = "Aprende los pasos necesarios para ejecutar el HTTP Endpoint Task desde un Step Function para poder eliminar las funciones Lambda que tienes para hacer llamadas a APIs"
 tags = ["AWS", "Serverless"]
 [[images]]
   src = "img/http-invoke-with-sam/title.png"
@@ -41,7 +41,7 @@ OpenWeatherConnection:
             Key: appid
 ```
 ## 2. Crear política de ejecución del Step Function 
-Se necesitan varios permisos para ejecutar con éxito paso de HTTP en step functions.
+Se necesitan varios permisos para ejecutar el paso de HTTP en step functions.
 
 1. Necesita acceso al secreto que la Conexión de EventBridge crea en Secrets Manager.
 2. Permiso para tomar las credenciales de conexión de la conexión de EventBridge.
@@ -97,4 +97,4 @@ Especificamos el método HTTP como GET, el ARN de conexión a nuestra conexión 
 ```
 
 # Conclusion
-Como puedes ver, no es tan complicado reemplazar cualquier función Lambda que tengas para hacer llamadas a APIs externos. Los permisos pueden volverse un poco complicados, pero una vez que los comprendes, simplemente puedes repetirlos para otras solicitudes que necesites hacer.
+Como puedes ver, no es tan complicado reemplazar cualquier función Lambda que tengas para hacer llamadas a APIs externos. Los permisos pueden volverse un poco complicados, pero una vez que los comprendes puedes repetirlos para otras solicitudes que necesites hacer.
