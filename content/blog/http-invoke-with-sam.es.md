@@ -3,7 +3,7 @@ title = "Llamar APIs desde Step Functions con SAM"
 date = 2024-01-23T00:00:00-00:00
 draft = false
 description = "Aprende los pasos necesarios para ejecutar el HTTP Endpoint Task desde un Step Function para poder eliminar las funciones Lambda que tienes para hacer llamadas a APIs"
-tags = ["AWS", "Serverless"]
+tags = ["AWS", "Serverless", "Step Functions"]
 [[images]]
   src = "img/http-invoke-with-sam/title.png"
   alt = "Imagen de un diagrama en excalibur mostrando Step Functions llamando Lambda y el Lambda llamando al Internet con el Lambda tachado"
