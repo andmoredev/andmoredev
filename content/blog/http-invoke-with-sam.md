@@ -94,4 +94,4 @@ We are specifying the HTTP method as GET, the connection ARN to our EventBridge 
 ```
 
 # Wrap Up
-As you can see it is not that complicated to replace any Lambda Functions you have to call third party endpoints. The permissions can get a little bit complicated but once you undrestand them you can repeat them for other requests you need to do.
+As you can see it is not that complicated to replace any Lambda Functions you have to call third party endpoints. The permissions can get a little bit complicated but once you understand them you can repeat them for other requests you need to do.
