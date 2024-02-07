@@ -1,8 +1,8 @@
 +++
 title = "Drop the layers, bundle up with ESBuild instead"
 date = 2024-02-07T00:00:00-00:00
-draft = true
-description = "Learn how you can structure your serverless projects to share code between Lambda Functions using ESBuild bundles instead of Lambda Layers."
+draft = false
+description = "Learn how you can structure your serverless projects to share code between Lambda Functions using ESBuild instead of Lambda Layers."
 tags = ["AWS", "Serverless", "Lambda"]
 [[images]]
   src = "img/layerless-esbuild-lambda/title.png"
@@ -10,7 +10,7 @@ tags = ["AWS", "Serverless", "Lambda"]
   stretch = "stretchH"
 +++
 
-I've seen a lot of posts around the problems that Lambda Layers bring, a very good one is called [You shouldn't use Lambda Layers](https://aaronstuyvenberg.com/posts/why-you-should-not-use-lambda-layers) by [AJ Stuyvenberg](https://twitter.com/astuyve). In this post AJ explains the myths and cons of using Lambda Layers. What is not easy to find is clear examples on how to actually get rid of Lambda Layers by using a bundler. In this post we will go through a structure and configuration that allows us to remove Layers by using ESBuild to bundle the dependencies and shared code for your functions.
+I've seen a lot of posts around the problems that Lambda Layers bring. A very good one is called [You shouldn't use Lambda Layers](https://aaronstuyvenberg.com/posts/why-you-should-not-use-lambda-layers) by [AJ Stuyvenberg](https://twitter.com/astuyve). In this post AJ explains the myths and cons of using Lambda Layers. What is not easy to find is examples on how to actually get rid of Lambda Layers by using a bundler. In this post we will go through a structure and configuration that allows us to remove Layers by using ESBuild to bundle the dependencies and shared code for our functions.
 
 ## Backstory
 I've been using Lambda Layers for a while as a way to share dependencies and code between different Lambda functions. This was done as a way to keep the code editable from the AWS console and reduce the amount of times we include an npm dependency in the package.json of functions. We had other problems than what AJ mentioned in his post, we noticed that once the project got to a certain size, deployments are a pain. Every deployment creates a new version of the layer which then creates an update for every single Lambda function that's consuming the layer. And this is why I started looking into moving away from layers and instead bundling with ESBuild.

@@ -1,7 +1,7 @@
 +++
 title = "Elimina el uso de capas en Lambda utilizando ESBuild para empaquetar"
 date = 2024-02-07T00:00:00-00:00
-draft = true
+draft = false
 description = "Aprende como puedes estructurar tus proyectos serverless para poder compartir codito y depenedencias entre tus funciones Lambda utilizando ESBuild en lugar the Layers."
 tags = ["AWS", "Serverless", "Lambda"]
 [[images]]
