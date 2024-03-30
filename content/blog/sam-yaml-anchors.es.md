@@ -5,7 +5,7 @@ draft = false
 description = "Aprende cómo puedes configurar tu plantilla SAM para reutilizar piezas comunes de configuración utilizando anclas y alias sin introducir problemas."
 tags = ["AWS", "Serverless", "SAM"]
 [[images]]
-  src = "img/sam-yaml-anchors/title.png"
+  src = "img/sam-yaml-anchors/title.es.png"
   alt = "Image of a diagram in excalibur showing a Step Function calling a Lambda Function and the Lambda Function calling out to the Internet with the Lambda Function crossed out"
   stretch = "stretchH"
 +++
