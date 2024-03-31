@@ -1,6 +1,6 @@
 +++
 title = "Using YAML anchors and aliases in a SAM template"
-date = 2024-03-26T00:00:00-00:00
+date = 2024-03-31T00:00:00-00:00
 draft = false
 description = "Learn how you can setup your SAM template to reuse common pieces of config by using anchors and aliases without introducing any problems."
 tags = ["AWS", "Serverless", "SAM"]

@@ -1,6 +1,6 @@
 +++
 title = "Usando anclas y alias de YAML en una plantilla SAM"
-date = 2024-03-26T00:00:00-00:00
+date = 2024-03-31T00:00:00-00:00
 draft = false
 description = "Aprende cómo puedes configurar tu plantilla SAM para reutilizar piezas comunes de configuración utilizando anclas y alias sin introducir problemas."
 tags = ["AWS", "Serverless", "SAM"]
