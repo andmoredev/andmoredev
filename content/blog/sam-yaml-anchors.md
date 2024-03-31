@@ -196,7 +196,7 @@ Resources:
     Metadata: *esbuild
 ```
 This is great! We can have several Lambda functions that share the same ESBuild configuration. But what happens when we want to define multiple anchors? If we were to add a second *Metadata* attribute we will now have invalid YAML since it doesn't accept duplicate properties names at the same level. The funny thing is this actually builds and deploys correctly so if you have no linting in your processes this might work for you. But there is a better way we can define multiple anchors without sacrificing our linting process.  
-Instead of making the *Metadata* property the anchor we can add multple anchors under the *Metadata* property. In the example below I am going to add a second anchor that contains only the *BuildProperties* and I'll update the base ESBuild config to use it.
+Instead of making the *Metadata* property the anchor we can add multiple anchors under the *Metadata* property. In the example below I am going to add a second anchor that contains only the *BuildProperties* and I'll update the base ESBuild config to use it.
 ```yaml
 AWSTemplateFormatVersion: 2010-09-09
 Description: Layerless ESBuild Example

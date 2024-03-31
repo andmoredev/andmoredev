@@ -10,7 +10,7 @@ tags = ["AWS", "Serverless", "SAM"]
   stretch = "stretchH"
 +++
 
-El mes pasado escribí artículo sobre [cómo deshacerse de las capas de Lambda usando ESBuild](https://www.andmore.dev/blog/layerless-esbuild-lambda/). Lo que aprendí rápidamente es que el atributo *Metadata* debe ser copiado y pegado para CADA función Lambda en tu stack. Intenté usar la sección *Global* en la plantilla SAM y resulta que no es compatible. Empecé a pensar en cómo podría reutilizar la misma configuración en toda mi plantilla y descubrí que YAML ya tiene una funcionalidad que hace esto llamada [Anclas y Alias de YAML](https://www.educative.io/blog/advanced-yaml-syntax-cheatsheet#anchors). En este artículo explicaré qué son los alias y anclas de YAML y cómo podemos usarlos en SAM.
+El mes pasado escribí un artículo sobre [cómo deshacerse de las capas de Lambda usando ESBuild](https://www.andmore.dev/es/blog/layerless-esbuild-lambda/). Lo que aprendí rápidamente es que el atributo *Metadata* debe ser copiado y pegado para CADA función Lambda en tu stack. Intenté usar la sección *Global* en la plantilla SAM y resulta que no es compatible. Comencé a ver cómo podría reutilizar la misma configuración en toda mi plantilla y descubrí que YAML ya tiene una funcionalidad que hace esto llamada [Anclas y Alias de YAML](https://www.educative.io/blog/advanced-yaml-syntax-cheatsheet#anchors). En este artículo explicaré qué son los alias y anclas de YAML y cómo podemos usarlos en SAM.
 
 ## ¿Qué son las anclas y alias de YAML?
 Puedes pensar en las *anclas* como asignar un valor a una variable para ser utilizada en otros lugares. La forma de definir una *ancla* es agregando un *&* en una entidad con el nombre de la ancla.
@@ -48,7 +48,7 @@ person:
           type: string
 ```
 
-YAML te permite anular y/o extender propiedades para poder obtener la estructura correcta. Para actualizar el objeto *name* y agregar una propiedad *minLength* para *firstName* e incluir un nuevo atributo llamado *middleName*, haríamos algo como esto.
+YAML te permite redefinir y/o extender propiedades para poder obtener la estructura correcta. Para actualizar el objeto *name* y agregar una propiedad *minLength* para *firstName* e incluir un nuevo atributo llamado *middleName*, haríamos algo como esto.
 ```yaml
 person:
   type: object
@@ -118,7 +118,7 @@ Resources:
     Metadata: *esbuild
 ```
 
-El template generado después de ejecutar `sam build` se ve así
+La plantilla generada después de ejecutar `sam build` se ve así
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Layerless ESBuild Example
@@ -196,8 +196,8 @@ Resources:
       Handler: index.handler
     Metadata: *esbuild
 ```
-¡Esto es genial! Podemos tener varias funciones Lambda que comparten la misma configuración de ESBuild. Pero, ¿qué sucede cuando queremos definir múltiples anclas? Si agregamos un segundo atributo *Metadata*, tendremos un YAML inválido, ya que no acepta nombres de propiedades duplicadas en el mismo nivel. Lo curioso es que esto se compila e implementa correctamente, por lo que si no tienes un proceso de linting, esto podría funcionar para ti. Pero hay una mejor manera de definir múltiples anclas sin sacrificar nuestro proceso de linting.
-En lugar de hacer que la propiedad *Metadata* sea el ancla, podemos agregar múltiples anclas debajo de la propiedad *Metadata*. En el siguiente ejemplo, agregaré un segundo ancla que solo contiene las *BuildProperties* y actualizaré la configuración base de ESBuild para usarlo.
+¡Esto es genial! Podemos tener varias funciones Lambda que comparten la misma configuración de ESBuild. Pero, ¿qué sucede cuando queremos definir múltiples anclas? Si agregamos un segundo atributo *Metadata*, tendremos un YAML inválido, ya que no acepta nombres de propiedades duplicadas en el mismo nivel. Lo curioso es que esto se compila y despliega correctamente, por lo que si no tienes un proceso de linting, esto podría funcionar para ti. Pero hay una mejor manera de definir múltiples anclas sin sacrificar nuestro proceso de linting.
+En lugar de hacer que la propiedad *Metadata* sea el ancla, podemos agregar múltiples anclas debajo de la propiedad *Metadata*. En el siguiente ejemplo, agregaré un segundo ancla que solo contiene las *BuildProperties* y actualizaré la configuración base de ESBuild para consumirla.
 ```yaml
 AWSTemplateFormatVersion: 2010-09-09
 Description: Layerless ESBuild Example
