@@ -1,7 +1,7 @@
 +++
 title = "Minimal Setup to Secure API Gateway with Cognito using SAM"
 date = 2024-03-31T00:00:00-00:00
-draft = true
+draft = false
 description = ""
 tags = ["AWS", "API", "Security", "Serverless", "SAM"]
 [[images]]
