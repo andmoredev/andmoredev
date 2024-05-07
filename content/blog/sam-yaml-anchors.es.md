@@ -6,7 +6,7 @@ description = "Aprende cómo puedes configurar tu plantilla SAM para reutilizar 
 tags = ["AWS", "Serverless", "SAM"]
 [[images]]
   src = "img/sam-yaml-anchors/title.es.png"
-  alt = "Image of a diagram in excalibur showing a Step Function calling a Lambda Function and the Lambda Function calling out to the Internet with the Lambda Function crossed out"
+  alt = "Imagen de mi viendo un enunciado grande que dice 'Anclas YAML en SAM"
   stretch = "stretchH"
 +++
 
