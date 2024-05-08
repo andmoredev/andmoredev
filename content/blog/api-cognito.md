@@ -11,7 +11,7 @@ tags = ["AWS", "API", "Security", "Serverless", "SAM"]
 +++
 
 # Backstory
-I am constantly creating APIs, these can be for blog posts, when I'm playing around with new functionality or for tools that I've created for myself. All of these have been created without authentication in place. Not securing your APIs while potentially exposing your data it can also pose a financial risk to your accounts if a malicious user gets ahold of these endpoints. This is why I've decided to secure my APIs from the beginning and I want this to be with the minimal setup necessary so that it's simple to replicate many times. 
+I am constantly creating APIs, these are for blog posts, when I'm playing around with new functionality or for tools that I've created for myself. All of these have been created without authentication in place. Not securing your APIs while potentially exposing your data it can also pose a financial risk to your accounts if a malicious user gets ahold of these endpoints. This is why I've decided to secure my APIs from the beginning and I want this to be with the minimal setup necessary so that it's simple to replicate many times. 
 
 We first need to understand a few concepts around what we're setting up.
 
