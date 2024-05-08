@@ -1,6 +1,6 @@
 +++
 title = "Secure API Gateway with Amazon Cognito using SAM"
-date = 2024-05-07T00:00:00-00:00
+date = 2024-05-08T00:00:00-00:00
 draft = false
 description = "Getting basic authentication for your API is not as hard as it sounds. In this post we'll be going through the steps to secure your APIs with Amazon Cognito"
 tags = ["AWS", "API", "Security", "Serverless", "SAM"]

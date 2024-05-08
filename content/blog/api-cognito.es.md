@@ -1,6 +1,6 @@
 +++
 title = "Asegurar API Gateway con Amazon Cognito usando SAM"
-date = 2024-05-06T00:00:00-00:00
+date = 2024-05-08T00:00:00-00:00
 draft = false
 description = "Obtener autenticación básica para tu API no es tan difícil como parece. En este artículo, repasaremos los pasos para asegurar nuestras APIs con Amazon Cognito"
 tags = ["AWS", "API", "Security", "Serverless", "SAM"]
