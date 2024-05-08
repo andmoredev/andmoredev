@@ -166,7 +166,7 @@ To test this we need to go into the AWS console and grab the Client Id and Clien
 ### 2. Test un-authenticated request
 To verify our API is secure we will first run an unauthenticated request. To do this we will call our endpoint without setting anything for authentication, when we send this request we should get a 401 - Unauthorized response as shown below.  
 
-![Postman request showing an unauthorized resopnse](/img/api-cognito/postman-unauthorized.png)
+![Postman request showing an unauthorized response](/img/api-cognito/postman-unauthorized.png)
 
 ### 3. Set authentication data in Postman
 With the values we will now use a new [Postman feature called **Vaults**](https://learning.postman.com/docs/sending-requests/postman-vault/postman-vault-secrets/) that allows us to securely store sensitive data. To do this we will go into the Vault section in the bottom of the window and add our secrets.  
