@@ -1,0 +1,7 @@
+Color Pallete
+Amarillo - ffc526
+Blanco - fdf2dc
+Verde - 1a8d6e
+Naranja - fe6c19
+Gris - 52625f
+Negro - 0d1721

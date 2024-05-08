@@ -6,7 +6,7 @@ description = "Learn how you can setup your SAM template to reuse common pieces 
 tags = ["AWS", "Serverless", "SAM"]
 [[images]]
   src = "img/sam-yaml-anchors/title.png"
-  alt = "Image of a diagram in excalibur showing a Step Function calling a Lambda Function and the Lambda Function calling out to the Internet with the Lambda Function crossed out"
+  alt = "Image of me looking at a big text that says 'YAML Anchors in SAM"
   stretch = "stretchH"
 +++
 
