@@ -84,7 +84,7 @@ We need to make sure other stacks can get access to the User Pool Id and ARN to 
 Now we can go and add authentication to our API stack using this user pool.
 
 ## API Stack
-I will be adding authentication to an existing API [in this GitHub repository](https://github.com/andmoredev/layerless-esbuild-lambda).
+I will be adding authentication to an existing API [in this GitHub repository](https://github.com/andmoredev/layerless-esbuild-lambda). To look at the specific changes I made to get authentication working, you can look at the [PR where I did this](https://github.com/andmoredev/layerless-esbuild-lambda/pull/52/files).
 
 ### 1. Consuming Auth Stack resources
 We first need to get the user pool Id and ARN from SSM by adding them into the *Parameters* section of our template.

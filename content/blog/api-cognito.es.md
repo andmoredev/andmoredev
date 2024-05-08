@@ -84,7 +84,7 @@ Necesitamos asegurarnos de que otros stacks puedan acceder al Id y ARN del user 
 Ahora podemos agregar autenticación a un stack separado usando el mismo user pool.
 
 ## Stack de API
-Agregaré autenticación a una API existente [en este repositorio de GitHub.](https://github.com/andmoredev/layerless-esbuild-lambda)
+Agregaré autenticación a una API existente [en este repositorio de GitHub.](https://github.com/andmoredev/layerless-esbuild-lambda). Para ver los cambios especificos que hice para agregar autenticación, [pueden ver el PR donde hice esto](https://github.com/andmoredev/layerless-esbuild-lambda/pull/52/files).
 
 ### 1. Consumir recursos del Stack de Autenticación
 Primero necesitamos obtener el Id y ARN del grupo de usuarios de SSM agregándolos a la sección Parameters de nuestra plantilla.
