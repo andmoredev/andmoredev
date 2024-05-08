@@ -5,7 +5,7 @@ draft = false
 description = ""
 tags = ["AWS", "API", "Security", "Serverless", "SAM"]
 [[images]]
-  src = "img/api-cognito/title.png"
+  src = "img/api-cognito/title-es.png"
   alt = ""
   stretch = "stretchH"
 +++
