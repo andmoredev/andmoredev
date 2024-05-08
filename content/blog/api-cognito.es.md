@@ -1,8 +1,8 @@
 +++
-title = "Minimal Setup to Secure API Gateway with Cognito using SAM"
-date = 2024-03-31T00:00:00-00:00
+title = "Asegurar API Gateway con Amazon Cognito usando SAM"
+date = 2024-05-06T00:00:00-00:00
 draft = false
-description = ""
+description = "Obtener autenticación básica para tu API no es tan difícil como parece. En este artículo, repasaremos los pasos para asegurar nuestras APIs con Amazon Cognito"
 tags = ["AWS", "API", "Security", "Serverless", "SAM"]
 [[images]]
   src = "img/api-cognito/title-es.png"
@@ -10,52 +10,52 @@ tags = ["AWS", "API", "Security", "Serverless", "SAM"]
   stretch = "stretchH"
 +++
 
-# Backstory
-I am constantly creating APIs, whether they are for blog posts, playing around with new functionality or tools that I use daily. I've been creating these without any authentication in place. Doing this can pose a financial risk to my accounts if someone gets ahold of these endpoints. So I've decided to secure my APIs from the beginning using the bare minimum setup with Cognito.  In this post I will be setting up authentication to API Gateway with Cognito.
+# Historia
+Constantemente estoy creando APIs, ya sea para publicaciones en blogs, mientras estoy probando nuevas funcionalidades o para herramientas que he creado para mí mismo. Todas estas han sido creadas sin autenticación. No asegurar tus APIs mientras potencialmente expones tus datos también puede representar un riesgo financiero para tus cuentas si un usuario malicioso se apodera de estos puntos finales. Es por eso que he decidido asegurar mis APIs desde el principio y quiero que esto se haga con la mínima configuración necesaria para que sea fácil de replicar muchas veces.
 
-# What is Cognito?
-AWS Cognito is a service provided by Amazon Web Services (AWS) that allows you to add authentication to your applications or services. It integrates natively with API Gateway to secure each endpoint.  
+Primero necesitamos entender algunos conceptos sobre lo que estamos configurando.
 
-There are a several pieces that we need to secure our API using Cognito. Let's go over these:
+# ¿Qué es Cognito?
+Amazon Cognito es un servicio proporcionado por AWS que te permite agregar autenticación a tus aplicaciones o servicios. Se integra nativamente con API Gateway para asegurar cada punto final.
+
+Cognito tiene múltiples capas donde puedes aplicar diferentes tipos de configuraciones, lo que nos da la flexibilidad para configurar las cosas para diferentes casos de uso.
 
 1. **User Pool** - 
-A Cognito user pool is the backbone to everything in Cognito. This is an [OpenID Connect identity provider](https://auth0.com/docs/authenticate/protocols/openid-connect-protocol) which contains the user directory to authenticate and authorize users.
+Un user pool de Cognito es la columna vertebral de todo en Cognito. Este es un [ proveedor de identidades OpenID Connect](https://auth0.com/docs/authenticate/protocols/openid-connect-protocol) que contiene el directorio de usuarios para autenticar y autorizar usuarios.
 
 2. **User Pool Domain** -
-The user pool domain is used to give the authentication url a better name for us to use and give more confidence to our users.
+El user pool domain se utiliza para darle un mejor nombre a la URL de autenticación para que la utilicemos y dar más confianza a nuestros usuarios.
+
 
 3. **Resource Server** -
-[An OAuth 2.0 API server](https://www.oauth.com/oauth2-servers/the-resource-server/) that validates that an access token contains the scopes that authorize the requested endpoint in the API.
+[Un servidor de API OAuth 2.0 ](https://www.oauth.com/oauth2-servers/the-resource-server/) que valida que un token de acceso contenga los ámbitos que autorizan el punto final solicitado en la API.
 
 4. **User Pool Client** -
-User pool clients is a configuration within a user pool that interacts with your application that will be authenticating using Cognito whether that is going to be done from a UI or a backend service. 
+Un user pool client es una configuración dentro de un grupo de usuarios que interactúa con tu aplicación que se autenticará usando Cognito.
 
-# Authentication Flows
-There are several authentication flows that you can use for your applications. [In this post from Auth0](https://auth0.com/docs/get-started/authentication-and-authorization-flow) you can get a better understanding about which flow is better for your use case.  
-Since I am setting up very basic authentication to be able to test with Postman I will be using the [Client Credentials Flow (CCF)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) to allow us to authenticate our requests by sending a *client id* and a *client secret* in exchange for an *access token* in the form of a [JSON Web Token (JWT)](https://jwt.io/introduction). The CCF is recommended when working with Machine-to-Machine (M2M) communication like CLIs, APIs, etc.
+# Flujos de Autenticación
+Existen varios flujos de autenticación que puedes usar para tus aplicaciones. [En esta publicación de Auth0](https://auth0.com/docs/get-started/authentication-and-authorization-flow) puedes obtener una mejor comprensión sobre qué flujo es mejor para tu caso de uso. Dado que estoy configurando una autenticación muy básica para poder probar mi API con Postman, utilizaré el  [Client Credentials Flow (CCF)](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow) para permitirnos autenticar nuestras solicitudes enviando un id de cliente y un secreto de cliente a cambio de un token de acceso en forma de un [JSON Web Token (JWT)](https://jwt.io/introduction). El CCF se recomienda cuando se trabaja con comunicación de Máquina a Máquina (M2M) como CLIs, APIs, etc.
 
-# Setting it all up with SAM
-Since I create many APis, I really don't want to create a Cognito User Pool per API that I create, so to simplify my authentication architecture I will be having a single Auth Stack that will contain the *User Pool* and the *User Pool Domain* definition, the user pool data will be set in an SSM parameter that will be able to be consumed by other stacks. Below is a picture that shows how this would look.
+# Configurándolo todo con SAM
+No quiero tener un Grupo de Usuarios de Cognito por cada API que cree, para simplificar esto, tendré un solo Stack de Autenticación que contendrá los recursos de Grupo de Usuarios y Dominio del Grupo de Usuarios. Luego compartiremos los datos de este stack con nuestros otros stacks para poder crear el Servidor de Recursos y los Clientes del Grupo de Usuarios en stacks separados. A continuación, se muestra una imagen que muestra cómo se ve esto.
 
-![CloudFormation Stack Architecture](/img/api-cognito/stack-architecture.png)
+![Arquitectura del stack de cloudformation](/img/api-cognito/stack-architecture.png)
 
-As shown in the image above, we have the auth stack where we define our Cognito User Pool and User Pool Domain. Then each application that wants to authenticate using this user pool will create it's own Resource Server and User Pool Client.
+Ahora veamos cómo se configuran cada una de estas piezas usando SAM.
 
-Now let's see how each of these pieces are setup using SAM
-
-## Auth Stack
-Here we are going to define the resources that are going to be able to be consumed by other APIs to authenticate.  
-You can find my full setup for this stack [in this GitHub repository](https://github.com/andmoredev/cognito-auth)
+## Stack de Autenticación
+En este stack vamos a definir los recursos que serán consumidos por otras APIs para autenticarse.
+Puedes encontrar toda mi configuración completa para este stack [en este repositorio de GitHub](https://github.com/andmoredev/cognito-auth)
 
 ### 1. User Pool
-The User Pool requires minimal setup when doing CCF, you simply need to define the resource with no configuration. You are able to add more restrictions and configuration but as mentioned before, we are trying to keep it to the bare minimum here.
+El User Pool no requiere mucha configuración al hacer CCF. Puedes agregar más restricciones y configuraciones, pero como se mencionó antes, estamos tratando de mantenerlo simple por ahora.
 ```yaml
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
 ```
 
 ### 2. User Pool Domain
-The user pool domain is used to give the authentication url a better name for us to use and give more confidence to our users. In my setup I will be using `andmoredev` as my domain which makes our sign in url look like `https://andmoredev.auth.us-east-1.amazoncognito.com/login`. You can setup up your own custom domain that does not include anything generated by AWS in the URL by setting up the `CustomDomainConfig`.
+En mi configuración, estoy usando andmoredev como mi dominio, lo que hace que nuestra URL de inicio de sesión se vea como `https://andmoredev.auth.us-east-1.amazoncognito.com/login`. Puedes configurar tu propio dominio personalizado que no incluya nada generado por AWS en la URL configurando el *CustomDomainConfig*.
 ```yaml
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -64,7 +64,7 @@ The user pool domain is used to give the authentication url a better name for us
       Domain: andmoredev
 ```
 
-We need to make sure other stacks can get access to the User Pool Id and ARN to be able to create the necessary resources. To do this we are going to use SSM Paramters.
+Necesitamos asegurarnos de que otros stacks puedan acceder al Id y ARN del Grupo de Usuarios para poder crear los recursos necesarios. Para hacer esto, vamos a usar Parámetros de SSM.
 ```yaml
   CognitoUserPoolIdParameter:
     Type: AWS::SSM::Parameter
@@ -81,12 +81,13 @@ We need to make sure other stacks can get access to the User Pool Id and ARN to 
       Value: !GetAtt CognitoUserPool.Arn
 ```
 
-Now we can add authentication to a separate stack using the same user pool.
+Ahora podemos agregar autenticación a un stack separado usando el mismo grupo de usuarios.
 
-## API Stack
-Now let's use the user pool for one of our APIs, for this example I will be setting up authentication to an API I had previously created. [Here is the GitHub repository](https://github.com/andmoredev/layerless-esbuild-lambda) with the added authentication.
-### 1. Consuming Auth Stack resources
-Since the auth stack defined SSM parameters for the data we need to setup our resource server and client, all we need to do is consume these int he parameters section of the SAM template as shown below.
+## Stack de API
+Agregaré autenticación a una API existente [en este repositorio de GitHub.](https://github.com/andmoredev/layerless-esbuild-lambda)
+
+### 1. Consumir recursos del Stack de Autenticación
+Primero necesitamos obtener el Id y ARN del grupo de usuarios de SSM agregándolos a la sección Parameters de nuestra plantilla.
 ```yaml
 Parameters:
   CognitoUserPoolId:
@@ -99,7 +100,8 @@ Parameters:
 ```
 
 ### 2. Resource Server
-We are creating a simple resource server with one scope that will be used to give access to any endpoint in our APIs. I will not go into more details on more advanced scope design in this post.
+Estamos creando un resource server con un scope que se utilizará para dar acceso a todos los puntos finales de nuestra API. No entraré en más detalles sobre el diseño de scopes más avanzados en esta publicación.
+
 ```yaml
   LayerlessESBuildResourceServer:
     Type: AWS::Cognito::UserPoolResourceServer
@@ -113,6 +115,7 @@ We are creating a simple resource server with one scope that will be used to giv
 ```
 
 ### 3. User Pool Client
+A continuación se muestra la definición para nuestro user pool client.
 ```yaml
   CognitoTestAutomationClient:
     Type: AWS::Cognito::UserPoolClient
@@ -125,12 +128,19 @@ We are creating a simple resource server with one scope that will be used to giv
         - client_credentials
       AllowedOAuthScopes:
         - layerless-esbuild/api
+      AllowedOAuthFlowsUserPoolClient: true
 ```
+Hablemos sobre las propiedades que hemos configurado para nuestro cliente del grupo de usuarios.
+* UserPoolId - referencia al Id del grupo de usuarios creado en nuestro Stack de Autenticación.
+* GenerateSecret - esto es necesario para que podamos usar el flujo de CCF.
+* AllowedOAuthFlows - le estamos diciendo a Cognito que este cliente solo permitirá CCF
+* AllowedOAuthScopes - Necesitamos asegurarnos de que este array contenga ámbitos que hayan sido definidos en nuestro servidor de recursos.
+* AllowedOAuthFlowsUserPoolClient - Esto es lo que nos permite usar funcionalidades de OAuth estándar con nuestro cliente de grupo de usuarios.
 
-We need to explicitly tell it to generate a secret by settin gthe *GenerateSecret* attribute to true, this is normal when working with a client credentials flow, but is not recommended when creating a client that will be used by a frontend. We are only going to allow this client to authenticate using the `client_credentials` OAuth flow and we need to provide it access to the scope we setup for our resource server. I've seen deployment scenarios where the resource server gets deployed after the client and we get an error saying the scope does not exist, this is the reason I am explicitly adding the `DependsOn` for this resource.
+He visto escenarios de implementación donde el servidor de recursos se implementa después del cliente y obtenemos un error que dice que el ámbito no existe, esta es la razón por la que estoy agregando explícitamente el `DependsOn` para este recurso.
 
-### 4. Hooking it all up to API Gateway
-To tell our API Gateway to authenticate using our new Cognito User Pool we need to add teh *Auth* property, it will look something like this.
+### 4. Conexión a API Gateway
+Para indicarle a nuestro API Gateway que se autentique usando nuestro nuevo grupo de usuarios de Cognito, necesitamos agregar la propiedad Auth, se verá algo así.
 ```yaml
   Auth:
     DefaultAuthorizer: ClientCognitoAuthorizer
@@ -141,40 +151,44 @@ To tell our API Gateway to authenticate using our new Cognito User Pool we need 
           - layerless-esbuild/echo
 ```
 
-# Testing it using Postman
+Estamos consumiendo el ARN del grupo de usuarios del Stack de Autenticación y permitiendo el ámbito que hemos creado en nuestro servidor de recursos.
 
-## 1. Grab authentication data
-To be able to test this we need to go into the console and grab the Client Id and Client Secret that was generated. These are located in the Cognito service by selecting your user pool and in the *App integration* section in the bottom you will see your new app client, once you open it you will something like the image below, you can copy the Client ID and Client secret from here to be used for your requests.  
+# Probándolo usando Postman
 
-![AWS Console showing an application client in Cognito where we can grab the client id and secret](/img/api-cognito/cognito-client-keys.png)
+## 1. Obtener datos de autenticación
+Para poder probar esto, necesitamos ir a la consola y obtener el Id de Cliente y el Secreto de Cliente que se generaron. Estos se encuentran en el servicio de Cognito seleccionando tu grupo de usuarios y yendo a la sección Integración de Aplicaciones. En la parte inferior, verás tu nuevo cliente de aplicación, una vez que lo abras, verás algo como la imagen a continuación. Puedes copiar el Id de Cliente y el Secreto de Cliente desde aquí, usaremos estos valores en los próximos pasos. 
 
-> Please handle these values with care, if compromised someone could gain access to your APIs and do malicious things.
+![Consola de AWS mostrando un user pool client en Cognito donde podemos obtener el id y el secreto](/img/api-cognito/cognito-client-keys.png)
 
-## 2. Run un-authenticated request
-To verify our API is secure we will first run an unauthenticated request. To do this we will call our endpoint without setting anything for the authentication, when we send this request we should get a 401 - Unauthorized response as shown below.  
+> Por favor, maneja estos valores con cuidado, si se comprometen, alguien podría obtener acceso a tus APIs y hacer cosas maliciosas.
 
-![Postman request showing an unauthorized resopnse](/img/api-cognito/postman-unauthorized.png)
+## 2. Ejecutar una solicitud no autenticada
+Para verificar que nuestra API es segura, primero ejecutaremos una solicitud no autenticada. Para hacer esto, llamaremos a nuestro punto final sin configurar nada para la autenticación, cuando enviemos esta solicitud, deberíamos recibir una respuesta 401 - No autorizada como se muestra a continuación.  
 
-## 3. Set authentication data in Postman
-With the values we will now use a new [Postman feature called **Vaults**](https://learning.postman.com/docs/sending-requests/postman-vault/postman-vault-secrets/) that allow us to securely store sensitive data. To do this we will go into the Vault section in the bottom of the window and add our secrets as shown in the picture below.  
+![Solicitud de Postman mostrando una respuesta no autorizada](/img/api-cognito/postman-unauthorized.png)
 
-![Postman Vault window showing an item for clientId and clientSecret and their masked values](/img/api-cognito/postman-vault.png)
+## 3. Configurar datos de autenticación en Postman
+Con los valores, ahora utilizaremos una nueva función [de Postman llamada **Vaults**](https://learning.postman.com/docs/sending-requests/postman-vault/postman-vault-secrets/) que nos permite almacenar de forma segura datos sensibles. Para hacer esto, iremos a la sección Vault en la parte inferior de la ventana y agregaremos nuestros secretos.  
 
-## 4. Setup request authentication
-Now back in the Postman request we can set the Authorization configuration. We need to setup a few things here.  
-* Grant type - This will have a value of *Client Credentials*
-* Access Token URL - The value for your specific user pool will vary depending on your configured user pool domain. It will look something like this `https://[your-domain].auth.us-east-1.amazoncognito.com/oauth2/token`
-* Client ID - We will grab this from the vault by setting a value of `{{vault:clientId}}`
-* Client Secret - Also from the vault with a value of `{{value:clientSecert}}`
-* Scope - This will be based on what was set on the resource server. From our example it will be `layerless-esbuild/echo`.
+![Ventana de Vault de Postman mostrando un elemento para clientId yclientSecret y sus valores enmascarados](/img/api-cognito/postman-vault.png)
 
-![Postman Authorization Configuration with all the values mentioned above filled in](/img/api-cognito/postman-authorization-configuration.png)
+## 4. Configurar la autenticación de la solicitud
+Ahora de regreso en la solicitud de Postman, podemos configurar la autenticación. Necesitamos configurar algunas cosas aquí.    
+* Grant type - Esto tendrá un valor de *Client Credentials*
+* Access Token URL - El valor para tu grupo de usuarios específico variará según tu dominio de grupo de usuarios configurado. Se verá algo así `https://[your-domain].auth.us-east-1.amazoncognito.com/oauth2/token`
+* Client ID - Lo obtendremos del vault configurando un valor de `{{vault:clientId}}`
+* Client Secret - También del vault con un valor de `{{value:clientSecert}}`
+* Scope - Esto se basará en lo que se estableció en el servidor de recursos. A partir de nuestro ejemplo, será  `layerless-esbuild/echo`.
 
-## 5. Get a token
-We can now get a new access token by going to the bottom of the Authorization section and pressing the *Get New Access Token* button. If successful you will receive a prompt where you can click a button that says *Use Token*. By pressing that button you will get the value presented in the Access Token and it will be used in the *Authorization* header of your request.
+![Colnfiguracion de Postman con todos los valores mencionados arriba completados](/img/api-cognito/postman-authorization-configuration.png)
 
-If we send the request now we will get a successful response.
-![Postman showing a successful request](/img/api-cognito/postman-success.png)
+## 5. Obtener un token
+Ahora podemos obtener un nuevo token de acceso yendo al fondo de la sección de Autorización y presionando el botón Obtener Nuevo Token de Acceso. Si es exitoso, recibirás un mensaje donde puedes hacer clic en un botón que dice Usar Token. Al presionar ese botón, recibirás el valor presentado en el Token de Acceso y se utilizará en el encabezado Autorización de tu solicitud.
 
-# Wrap Up
+Si enviamos la solicitud ahora, recibiremos una respuesta exitosa.
 
+![Postman mostrando una solicitud exitosa](/img/api-cognito/postman-success.png)
+
+# Conclusión
+Lamentablemente, la seguridad a menudo se deja como una reflexión posterior, tal como me sucedió a mí con todas las APIs que he creado. En esta publicación pudimos comprender algunos de los conceptos relacionados con la autenticación y los recursos necesarios para configurar esto en AWS con Amazon Cognito. También probamos que nuestra API ahora es segura y cómo podemos obtener un token para autenticarnos contra ella.
+Espero que esto permita a las personas agregar una capa básica de seguridad a sus APIs para que hagamos que los usuarios maliciosos trabajen un poco más.

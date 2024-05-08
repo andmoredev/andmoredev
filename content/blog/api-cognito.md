@@ -48,7 +48,7 @@ In this stack we are going to define the resources that will be consumed by othe
 You can find my full setup for this stack [in this GitHub repository](https://github.com/andmoredev/cognito-auth)
 
 ### 1. User Pool
-The User Pool requires doesn't require a lot of configuration when doing CCF. You are able to add more restrictions and configuration but as mentioned before, we are trying to keep it simple for now.
+The User Pool doesn't require a lot of configuration when doing CCF. You are able to add more restrictions and configuration but as mentioned before, we are trying to keep it simple for now.
 ```yaml
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
