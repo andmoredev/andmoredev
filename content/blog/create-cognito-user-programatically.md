@@ -5,7 +5,7 @@ draft = false
 description = "Let's walk through the steps needed to create a user in Amazon Cognito to be used for automation."
 tags = ["AWS", "Security", "Cognito"]
 [[images]]
-  src = "img/create-cognito-user-programmatically/title.jpg"
+  src = "img/create-cognito-user-programmatically/title.png"
   alt = ""
   stretch = "stretchH"
 +++
