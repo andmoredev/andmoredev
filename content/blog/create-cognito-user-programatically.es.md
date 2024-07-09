@@ -1,47 +1,47 @@
 +++
-title = "Creating a user in Amazon Cognito programmatically"
+title = "Creando un usuario en Amazon Cognito de forma programática"
 date = 2024-06-30T00:00:00-00:00
 draft = false
-description = "Short post to walk through the steps to create a user in Amazon Cognito to be used for automation"
-tags = ["AWS", "Security", "Cognito"]
+description = "Breve publicación para recorrer los pasos para crear un usuario en Amazon Cognito para ser utilizado en la automatización"
+tags = ["AWS", "Seguridad", "Cognito"]
 [[images]]
   src = "img/create-cognito-user-programmatically/title-es.png"
   alt = ""
   stretch = "stretchH"
 +++
 
-When you have CI/CD pipelines that run automated tests against your APIs you might need to dynamically create users in Amazon Cognito to run them. If that is the case you are in the right place. In this post we'll be going over what you need to do to create a valid user in Cognito to be used by your automation.
+Cuando tienes pipelines de CI/CD que ejecutan pruebas automatizadas contra tus APIs, es posible que necesites crear usuarios dinámicamente en Amazon Cognito para ejecutarlas. Si ese es el caso, estás en el lugar correcto. En esta publicación, repasaremos lo que necesitas hacer para crear un usuario válido en Cognito que pueda ser utilizado por tu automatización.
 
-## Create user in Cognito
-The first thing we need to do is to create a user in our Cognito User Pool. Since this is for automation purposes I am creating users using the *andmore.dev* domain that I own. I want these users scoped to the specific repository that is running the CI/CD pipeline, so I'm generating a username with a UUID.
+## Crear usuario en Cognito
+Lo primero que debemos hacer es crear un usuario en nuestro Cognito User Pool. Dado que esto es para fines de automatización, estoy creando usuarios utilizando el dominio *andmore.dev* que poseo. Quiero que estos usuarios estén limitados al repositorio específico que está ejecutando el pipeline de CI/CD, por lo que estoy generando un nombre de usuario con un UUID.
 
 ```bash
 username=$(uuidgen)@andmore.dev
-aws cognito-idp admin-create-user --user-pool-id [YOUR-USERPOOL-ID] --username $username --message-action SUPPRESS
+aws cognito-idp admin-create-user --user-pool-id [TU-ID-DE-USER-POOL] --username $username --message-action SUPPRESS
 ```
-In the commands above, I am generating the username with new uuid, since I have email forwarding enabled for my domain, each new user will send me an email. To avoid this I have added the `--message-actions` property as `SUPPRESS`, this will disable any messages from being sent.
+En los comandos anteriores, estoy generando el nombre de usuario con un nuevo UUID. Dado que tengo habilitado el reenvío de correo electrónico para mi dominio, cada nuevo usuario me enviará un correo electrónico. Para evitar esto, he agregado la propiedad `--message-actions` como `SUPPRESS`, esto desactivará el envío de cualquier mensaje.
 
-This is all we need right? I thought this too, but there is more. The user is created with a temporary password and is not usable yet. Since we are doing this for an automated process, we can't really go through the flow of opening the email, signing in and changing the password. So let's see what else we need to do.
+¿Con esto es suficiente, verdad? Yo también pensé eso, pero hay más. El usuario se crea con una contraseña temporal y aún no se puede utilizar. Dado que estamos haciendo esto para un proceso automatizado, no podemos realmente seguir el flujo de abrir el correo electrónico, iniciar sesión y cambiar la contraseña. Así que veamos qué más necesitamos hacer.
 
-## Verifying user
-Cognito offers a command that allows admins to set a users password, bypassing the manual steps mentioned above.
+## Verificar usuario
+Cognito ofrece un comando que permite a los administradores establecer la contraseña de un usuario, evitando los pasos manuales mencionados anteriormente.
 
 ```bash
 password=$(uuidgen)G1%
-aws cognito-idp admin-set-user-password --user-pool-id [YOUR-USERPOOL-ID] --username $username  --password $password --permanent
+aws cognito-idp admin-set-user-password --user-pool-id [TU-ID-DE-USER-POOL] --username $username  --password $password --permanent
 ```
-We first need to generate a password, to keep it simple I'm doing it by creating a new uuid and appending a capital letter, a number and a special character since my user pool requires this as part of the password policy that we set. Now we can provide this to the `admin-set-user-password` command and make sure we pass in the `--permanent` flag, since by default it will set the password as temporary therefore not allowing us to use it.
+Primero necesitamos generar una contraseña. Para mantenerlo simple, lo estoy haciendo creando un nuevo UUID y agregando una letra mayúscula, un número y un carácter especial, ya que mi grupo de usuarios requiere esto como parte de la política de contraseñas que hemos establecido. Ahora podemos proporcionar esto al comando `admin-set-user-password` y asegurarnos de pasar la bandera `--permanent`, ya que de forma predeterminada establecerá la contraseña como temporal y no nos permitirá usarla.
 
-Now the user is all setup to be able to authenticate using any of the flows you have setup for your Cognito User Pool Client.
+Ahora el usuario está configurado para poder autenticarse utilizando cualquiera de los flujos que hayas configurado para tu Cognito User Pool Client.
 
-## Delete the user
-You probably don't want to keep all of these users once your pipeline is done. To delete the user you will need to call the `admin-delete-user` command with the generated username. 
+## Eliminar el usuario
+Probablemente no quieras mantener todos estos usuarios una vez que tu pipeline haya terminado. Para eliminar el usuario, deberás llamar al comando `admin-delete-user` con el nombre de usuario generado.
 ```bash
-aws cognito-idp admin-delete-user --user-pool-id [YOUR-USERPOOL-ID] --username $username
+aws cognito-idp admin-delete-user --user-pool-id [TU-ID-DE-USER-POOL] --username $username
 ```
 
-## IAM Permissions
-To be able to run these commands you'll need permissions to run these for your Cognito user pool. Below is an example IAM policy that will give you the necessary permissions to run all three commands. Make sure to restrict the access to this policy since with this level of access people could create users and potentially do harm in your product.
+## Permisos de IAM
+Para poder ejecutar estos comandos, necesitarás permisos para ejecutarlos en tu grupo de usuarios de Cognito. A continuación, se muestra un ejemplo de política de IAM que te otorgará los permisos necesarios para ejecutar los tres comandos. Asegúrate de restringir el acceso a esta política, ya que con este nivel de acceso, las personas podrían crear usuarios y potencialmente causar daños en tu producto.
 ```json
 {
   "Effect": "Allow",
@@ -51,11 +51,11 @@ To be able to run these commands you'll need permissions to run these for your C
       "cognito-idp:AdminDeleteUser",
   ],
   "Resource": [
-      "YOUR-USERPOOL-ARN",
+      "TU-ARN-DE-USER-POOL",
   ]
 }
 ```
 
-## Wrap up
-We were able to easily create and verify a user to be used by our automation, as well as clean up after we are done so we are not left with orphaned users all over the place.
-I hope this is helpful to you. Cognito documentation is really not that straightforward and can be hard to find what you are looking for, this is why I'm trying to provide tutorials around Cognito, so stay tuned since I have more content lined up around this topic.
+## Conclusión
+Pudimos crear y verificar fácilmente un usuario para ser utilizado por nuestra automatización, así como limpiar después de que hayamos terminado para no quedarnos con usuarios huérfanos por todas partes.
+Espero que esto te sea útil. La documentación de Cognito realmente no es tan directa y puede ser difícil encontrar lo que estás buscando, por eso estoy tratando de proporcionar tutoriales sobre Cognito, así que mantente atento, ya que tengo más contenido preparado sobre este tema.
