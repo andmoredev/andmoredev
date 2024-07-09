@@ -1,12 +1,12 @@
 +++
-title = "Creating a user in Amazon Cognito programmatically"
-date = 2024-06-30T00:00:00-00:00
+title = "Creating users in Amazon Cognito programmatically"
+date = 2024-07-09T00:00:00-00:00
 draft = false
-description = "Short post to walk through the steps to create a user in Amazon Cognito for automation"
+description = "Short post to walk through the steps to create users in Amazon Cognito for automation"
 tags = ["AWS", "Security", "Cognito"]
 [[images]]
   src = "img/create-cognito-user-programmatically/title.png"
-  alt = ""
+  alt = "Title of the blog post and user icons with two of them with a picture of Andres"
   stretch = "stretchH"
 +++
 

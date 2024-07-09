@@ -1,12 +1,12 @@
 +++
-title = "Creando un usuario en Amazon Cognito de forma programática"
-date = 2024-06-30T00:00:00-00:00
+title = "Creando usuarios en Amazon Cognito de forma programática"
+date = 2024-07-09T00:00:00-00:00
 draft = false
 description = "Breve publicación para recorrer los pasos para crear un usuario en Amazon Cognito para ser utilizado en la automatización"
 tags = ["AWS", "Seguridad", "Cognito"]
 [[images]]
   src = "img/create-cognito-user-programmatically/title-es.png"
-  alt = ""
+  alt = "Titulo de el artículo con iconos de usuarios alineadas con la foto de Andres en dos de los usuarios"
   stretch = "stretchH"
 +++
 
