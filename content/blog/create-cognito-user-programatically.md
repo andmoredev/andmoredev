@@ -19,7 +19,7 @@ The first thing we need to do is to create a user in our Cognito User Pool. Sinc
 username=$(uuidgen)@andmore.dev
 aws cognito-idp admin-create-user --user-pool-id [YOUR-USERPOOL-ID] --username $username --message-action SUPPRESS
 ```
-In the commands above, I am generating the username with a new uuid, since I have email forwarding enabled for my domain, each new user will send me an email. To avoid this side effect I have added the `--message-actions` property as `SUPPRESS`, this will disable any messages from being sent.
+In the commands above, I am generating the username with a new uuid. Since I have email forwarding enabled for my domain, each new user will send me an email. To avoid this side effect I have added the `--message-actions` property as `SUPPRESS`, this will disable any messages from being sent.
 
 This is all we need right? I thought this too, but there is more. The user is created with a temporary password and is not usable yet. Since we are doing this for an automated process, we can't really go through the flow of opening the email, signing in and changing the password. So let's see what else we need to do.
 
@@ -40,7 +40,7 @@ You probably don't want to keep all of these users once your pipeline is done. T
 aws cognito-idp admin-delete-user --user-pool-id [YOUR-USERPOOL-ID] --username $username
 ```
 
-## IAM Permissions
+## Security
 To be able to run these commands you'll need permissions to run these for your Cognito user pool. Below is an example IAM policy that will give you the necessary permissions to run all three commands. 
 ```json
 {
@@ -79,7 +79,7 @@ Make sure to restrict the access to this policy since with this level of access 
 }
 ```
 
-The *token.actions.githubusercontent.com:sub* allows an array and wildcards so if you have a specific format for branching you can play around with the condition to meet your need while still being protected.
+The *token.actions.githubusercontent.com:sub* allows an array and wildcards so if you have a specific format for branching, you can play around with the condition properties to meet your needs while still being protected.
 
 ## Wrap up
 We were able to create and verify a user for our automation, as well as clean up after we are done so we are not left with orphaned users all over the place.
