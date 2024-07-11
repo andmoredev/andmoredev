@@ -1,6 +1,6 @@
 +++
 title = "Creating users in Amazon Cognito programmatically"
-date = 2024-07-09T00:00:00-00:00
+date = 2024-07-11T00:00:00-00:00
 draft = false
 description = "Short post to walk through the steps to create users in Amazon Cognito for automation"
 tags = ["AWS", "Security", "Cognito"]
