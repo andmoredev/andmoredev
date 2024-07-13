@@ -2,28 +2,29 @@
 title = "Secure API Gateway with Amazon Cognito using SAM - PKCE Edition"
 date = 2024-05-15T00:00:00-00:00
 draft = false
-description = "Last week I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their prices where my proposed setup would actually incur cost. In this post I will go through a different setup using the user password auth flow. This will still allow us to authenticate using Postman and will keep us in the free tier."
-tags = ["AWS", "Security", "Serverless", "SAM"]
+description = "Last week I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their prices where my proposed setup would actually incur cost. In this post I will go through a different setup using the user password auth flow. This will still allow us to authenticate from automations and form Postman while still keeping us in the free tier."
+tags = ["AWS", "Security", "SAM"]
 [[images]]
   src = "img/api-cognito-pkce/title.png"
   alt = ""
   stretch = "stretchH"
 +++
 
-On my last post called [Secure API Gateway with Amazon Cognito using SAM](https://www.andmore.dev/blog/api-cognito/) I talked about different Auth terms and walked through a setup to use the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow), but Cognito has recently introduced [pricing changes for machine-to-machine authentication](https://aws.amazon.com/about-aws/whats-new/2024/05/amazon-cognito-tiered-pricing-m2m-usage/) that will make this cost us and my main goal is to do this while staying in the free tier for personal projects that will not be generating any income. That is why in this post I am going to setup Amazon Cognito using a different flow called user password-based authentication. With this type of authentication we are charged based on the Monthly Active Users (MAUs) and AWS gives you the first 50,000 MAUs for free, and in my case this will usually stay at 1 user (Me!).
+On my post called [Secure API Gateway with Amazon Cognito using SAM](https://www.andmore.dev/blog/api-cognito/) I talked about different Auth terms and walked through a setup to use the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow), but Cognito has recently introduced [pricing changes for machine-to-machine authentication](https://aws.amazon.com/about-aws/whats-new/2024/05/amazon-cognito-tiered-pricing-m2m-usage/) that will make this cost us and my main goal is to do this while staying in the free tier for personal projects that will not be generating any income. That is why in this post I am going to setup Amazon Cognito using a different flow called user password-based authentication. With this type of authentication we are charged based on the Monthly Active Users (MAUs) and AWS gives you the first 50,000 MAUs for free, and in my case this will usually stay at 1 per project, so I should be fine.
 
-I recommend reading [my previous post](https://www.andmore.dev/blog/api-cognito/) which has a detailed explanation on the Amazon Cognito pieces we are going to use.
+## How does the user password flow work?
+Initially I thought I could use the [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header but that is now how this works. In the image below I have all the interactions that happen to get an authenticated request.
 
-## How does this flow work?
-Initially I thought I could use the [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header.
+![Authentication flow interactions](/img/api-cognito-pkce/USER_PASSWORD_AUTH-flow-summary.png)
 
-I've summarized all the interactions to two major steps.
-
-1. User provides the username and password. This will initiate the authentication with cognito which will return the access, id and refresh tokens. These are returned to the user.
+Let's dive deeper into each interaction
+1. Caller makes a request with the username and password to your API.
+1. API makes a call to 
+1. User provides the username and password. This will initiate the authentication with Cognito which will return the access, id and refresh tokens. These are returned to the user.
 
 1. When making API calls the user will provide the *id token* in the headers, the API is now responsible to verify this token against Cognito to make sure a valid token is being provided.
 
-![Authentication flow interactions](/img/api-cognito-pkce/USER_PASSWORD_AUTH-flow-summary.png)
+
 
 ## Setting it all up with SAM
 We are going to stick with a similar architecture for the Amazon Cognito resources to simplify each APIs configuration and to be able to use the same user directory for all our APIs and not have to setup our user for each stack we create.
