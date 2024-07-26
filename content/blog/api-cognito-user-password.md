@@ -5,7 +5,7 @@ draft = false
 description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would incur cost. In this post I will go through a different setup using the user password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
 tags = ["AWS", "Security", "SAM"]
 [[images]]
-  src = "img/api-cognito-pkce/title.png"
+  src = "img/api-cognito-user-password/title.png"
   alt = ""
   stretch = "stretchH"
 +++
@@ -15,7 +15,7 @@ On my post called [Secure API Gateway with Amazon Cognito using SAM](https://www
 ## How does the user password flow work?
 Initially I thought I could use [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header but that is now how this works. In the image below I have all the interactions that happen to get an authenticated request.
 
-![Authentication flow interactions](/img/api-cognito-pkce/USER_PASSWORD_AUTH-flow-summary.png)
+![Authentication flow interactions](/img/api-cognito-user-password/USER_PASSWORD_AUTH-flow-summary.png)
 
 Let's dive deeper into each interaction
 1. Caller makes a request with the username and password to your API.
@@ -27,7 +27,7 @@ Let's dive deeper into each interaction
 ## Setting it all up with SAM
 We are going to stick with a similar architecture for the Amazon Cognito resources to simplify each APIs configuration and to be able to use the same user directory for all our APIs and not have to setup users for each stack we create.
 
-![CloudFormation Stack Architecture](/img/api-cognito-pkce/stack-architecture.png)
+![CloudFormation Stack Architecture](/img/api-cognito-user-password/stack-architecture.png)
 
 Now let's see how each of these pieces are set up using SAM.
 
@@ -110,28 +110,28 @@ THAT'S IT!! We have now successfully setup everything needed to authenticate our
 ### 1. Grab Client Id
 We only need the client id when authenticating with the user-password flow, this is because we are actually going to enter a username and password to authenticate and that is where the token will be coming from. So we will get this value from the console by going into our new application client.
 
-![AWS Console showing an application client in Cognito where we can grab the client id](/img/api-cognito-pkce/cognito-client-keys.png)
+![AWS Console showing an application client in Cognito where we can grab the client id](/img/api-cognito-user-password/cognito-client-keys.png)
 
 ### 2. Requesting auth tokens
 To request the tokens we need to call Amazon Cognito specifying we are doing an *InitiateAuth* command.
 This will require us to make a POST call *https://cognito-idp.us-east-1.amazonaws.com*. The region will change depending on where you created your User Pool. We specify the command by adding the *X-Amz-Target*, we also need to specify the *Content-Type* since it's an AWS specific type. Below is a screenshot that shows how the headers should look.
-![Postman request headers](/img/api-cognito-pkce/postman-headers.png)
+![Postman request headers](/img/api-cognito-user-password/postman-headers.png)
 
 The body requires the following parameters:
 * AuthFlow - This is where we specify that we want to use the user-password flow by setting a value of *USER_PASSWORD_AUTH*
 * ClientId - We will set the value to the one we grabbed in step 1.
 * AuthParameters - in the object we will provide the *USERNAME* and the *PASSWORD* of our user.
 
-![Postman request body](/img/api-cognito-pkce/postman-body.png)
+![Postman request body](/img/api-cognito-user-password/postman-body.png)
 
 When you send this request you should get a response back with the *AccessToken*, *IdToken*, *RefreshToken*, *TokenType* and *ExpiresIn*. This also returns the *ChallengeParameters* but this flow does not require any challenge responses to be generated. (I've edited the full response from the picture before to not expose the full keys).
 
-![Postman response body](/img/api-cognito-pkce/postman-response.png)
+![Postman response body](/img/api-cognito-user-password/postman-response.png)
 
 ### 5. Make request
 Grabbing the *IdToken* from the response we got from the request above we can now take that and use it to authorize the request to the API endpoint as seen below.
 
-![Postman auth config and successful request](/img/api-cognito-pkce/postman-authorization-configuration.png)
+![Postman auth config and successful request](/img/api-cognito-user-password/postman-authorization-configuration.png)
 
 
 ## Authenticating for automation
@@ -162,7 +162,7 @@ const initiateAuthResponse = await axios({
 If you look at the code above it should seem very familiar to what we did in Postman. Making a POST request with the necessary headers and body. Once you get the response you can do whatever you need in your automation.
 
 I've provided 3 examples on how to handle the user credentials for this script.
-1. Create user programmatically - In this example we are [creating a Cognito user programmatically](https://www.andmore.dev/blog/create-cognito-user-programatically/) and using these credentials to authenticate. At the end of the run we delete the user so we don't have an endless amount of orphaned automation users.
+1. Create user programmatically - In this example we are [creating a Cognito user programmatically](https://www.andmore.dev/blog/create-cognito-user-programatically/) and using these credentials to authenticate by setting them as environment variables using the *>> $GITHUB_ENV* command. At the end of the run we delete the user so we don't have an endless amount of orphaned automation users.
 ```yaml
   test-api-with-user-password-auth-inline-create-user:
     name: Run Portman With USER_PASSWORD_AUTH - Inline Create User
@@ -205,7 +205,7 @@ I've provided 3 examples on how to handle the user credentials for this script.
 ```
 
 1. Use GitHub Secrets - 
-This is one of the simpler routes but requires you to copy and paste all your secrets into GitHub which might be a concern for some people. Here all you need to do is reference those secrets in the GitHub workflow
+This is one of the simpler routes but requires you to copy and paste all your secrets into GitHub which might be a concern for some people. All you need to do is reference the secrets in the GitHub workflow
 ```yaml
   test-api-with-user-password-auth-github-secrets:
     name: Run Portman With USER_PASSWORD_AUTH - Load GitHub Secrets
@@ -236,7 +236,5 @@ This is one of the simpler routes but requires you to copy and paste all your se
           npx @apideck/portman --cliOptionsFile portman/portman-cli.json --baseUrl ${{ inputs.BASE_URL }}
 ```
 
-1. User 1Password CLI - This is one that I really like since I already use 1Password to store all my credentials. With the CLI we can leverage the power of 1Password in our CI/CD pipelines, while also allowing teams to securely share secrets without having to copy them in many places.
-
 ## Wrap Up
-In this post we were able to update our authentication to use the user-password flow instead of M2M for our APIs, this allows us to stay within the Cognito free tier and will not have any cost. We were able to verify that I can still authenticate with Postman as well as my test automation. By doing this change we now have users in our User Pool that we can manage separately, this also allows us to use this same pattern when implementing user interface. Hopefully this shows the flexibility there is with Cognito and how you can configure it differently to satisfy your use cases.
+In this post we were able to update our authentication to use the user-password flow instead of M2M for our APIs, this allows us to stay within the Cognito free tier. We were able to verify that we can still authenticate with Postman as well as in the test automations. Hopefully this shows the flexibility there is with Cognito and how you can configure it differently to satisfy your use cases.
