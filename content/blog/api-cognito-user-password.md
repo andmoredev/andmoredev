@@ -25,7 +25,7 @@ Let's dive deeper into each interaction
 
 
 ## Setting it all up with SAM
-We are going to stick with a similar architecture for the Amazon Cognito resources to simplify each APIs configuration and to be able to use the same user directory for all our APIs and not have to setup users for each stack we create.
+We are going to stick with the same architecture for the Amazon Cognito resources to simplify each APIs configuration and to be able to manage users from a single location.
 
 ![CloudFormation Stack Architecture](/img/api-cognito-user-password/stack-architecture.png)
 
@@ -35,7 +35,7 @@ Now let's see how each of these pieces are set up using SAM.
 This stack has the resources that will be consumed by our API stacks.
 Full auth stack setup can be found [in this GitHub repository](https://github.com/andmoredev/cognito-auth)
 
-#### 1. Updates to User Pool
+#### 1. Updates to the User Pool
 Unlike our M2M setup that didn't need any properties for the user pool, for this type of authentication we need to setup properties that are specifying the attributes to be hosted for the user such as email, names, etc.
 ```diff yaml
   CognitoUserPool:
@@ -52,17 +52,16 @@ Unlike our M2M setup that didn't need any properties for the user pool, for this
 ```
 
 The user pool attributes are:
-* UsernameAttributes - this is specifying what you allow as a user name. The options here are *email* or *phone_number*
-Now we can go and add authentication to our API stack using this user pool.
-* AutoVerifiedAttributes - attributes that you allow to be verified automatically by Cognito. For example we are using *email* this means Cognito will automatically send a verification email to verify the user. This requires the next attributes setup to work though. If we didn't set this attribute an administrator would have to manually verify users in Cognito.
-* VerificationMessageTemplate - This is where you can set your own template for the email that will get sent to users to verify. For this example we are using a default option provided by Cognito where they will confirm by clicking a link. The other option is *CONFIRM_WITH_CODE* where a user will receive a code and they will have to enter it manually to verify.
-* EmailConfiguration - This property allows us to setup the configuration for the sender email for the verification or any other communications happening from Cognito. In our case we are using *COGNITO_DEFAULT* which reduces the amount of setup we need to get custom emails setup. The *COGNITO_DEFAULT* has some limits that you will need to consider if you are using it, but right now it works for our use case.
+* *UsernameAttributes* - this is specifying what you allow as a user name. The options here are *email* or *phone_number*
+* *AutoVerifiedAttributes* - attributes that you allow to be verified automatically by Cognito. For example we are using *email* this means Cognito will automatically send a verification email to the user. If we didn't set this attribute an administrator would have to manually verify users in Cognito.
+* *VerificationMessageTemplate* - This is where you can set your own template for the email that will get sent to users to verify. For this example we are using a default option provided by Cognito where they will confirm by clicking a link. The other option is *CONFIRM_WITH_CODE* where a user will receive a code and they have to enter it manually to verify.
+* *EmailConfiguration* - This property allows us to setup the configuration for the sender email for the verification or any other communications happening from Cognito. In our case we are using *COGNITO_DEFAULT* which reduces the amount of setup we need to get an Amazon SES verified email. The *COGNITO_DEFAULT* has some [limits](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) that you will need to consider if you are using it.
 
 ### API Stack
-Our API Stack is actually simplified when using this flow. Why? We do not need to create a resource server to be able to use an authorization scope since we will not be using OAuth capabilities. 
+Our API Stack is simplified when using this flow. Why? We do not need to create a resource server since we will not be using OAuth capabilities. 
 
-#### 1. Remove unnecessary resources
-We will get rid of our Resource Server to use the default scopes.
+#### 1. Delete UserPoolResourceServer
+As mentioned before, we don't need this resource anymore. So let's get rid of it from our stack by removing it from the template.
 
 #### 2. User Pool Client Updates
 Below is the definition for our user pool client.
@@ -85,11 +84,11 @@ Below is the definition for our user pool client.
 ```
 
 I few changes need to be done in order for this authentication flow to work. 
-* GenerateSecret - We first get rid of this property since it is not needed for this flow.
-* AllowedOAuthFlows - When using the User/Password auth flow we do not need to set this property.
-* AllowedOAuthScopes - Since we are not using an OAuth flow we do not need to set up scopes.
-* SupportedIdentityProviders - We are going to use *COGNITO* as our only provider. You can configure different identity providers to simplify your users sign in by using Google, Facebook or any of the supported providers.
-* ExplicitAuthFlows: this is where we will configure the *ALLOW_USER_PASSWORD_AUTH* which will allow us to authenticate using a username and a password. I've added *ALLOW_REFRESH_TOKEN_AUTH* since it's required but we will not be going to do token refreshes in this post.
+* *GenerateSecret* - We first get rid of this property since it is not needed for this flow.
+* *AllowedOAuthFlows* - When using the User/Password auth flow we do not need to set this property.
+* *AllowedOAuthScopes* - Since we are not using an OAuth flow we do not need to set up scopes.
+* *SupportedIdentityProviders* - We are going to use *COGNITO* as our only provider. You can configure different identity providers to simplify your users sign in by using Google, Facebook or any of the supported providers.
+* *ExplicitAuthFlows*: this is where we will configure the *ALLOW_USER_PASSWORD_AUTH* which will allow us to authenticate using a username and a password. I've added *ALLOW_REFRESH_TOKEN_AUTH* since it's required but we will not be going to do token refreshes in this post.
 
 #### 4. Updates to API Gateway
 The only thing that needs to change in the API Gateway is the removal of the *AuthorizationScopes*. For this flow this is not needed.
@@ -105,26 +104,27 @@ The only thing that needs to change in the API Gateway is the removal of the *Au
 
 THAT'S IT!! We have now successfully setup everything needed to authenticate our API using the user-password flow.
 
-## Testing it with Postman
+## Testing with Postman
 
 ### 1. Grab Client Id
-We only need the client id when authenticating with the user-password flow, this is because we are actually going to enter a username and password to authenticate and that is where the token will be coming from. So we will get this value from the console by going into our new application client.
+We only need the client id when authenticating with the user-password flow, this is because we are going to enter a username and password to authenticate and that is where the token will be coming from. So we will get this value from the console by going into our new application client.
 
 ![AWS Console showing an application client in Cognito where we can grab the client id](/img/api-cognito-user-password/cognito-client-keys.png)
 
 ### 2. Requesting auth tokens
 To request the tokens we need to call Amazon Cognito specifying we are doing an *InitiateAuth* command.
-This will require us to make a POST call *https://cognito-idp.us-east-1.amazonaws.com*. The region will change depending on where you created your User Pool. We specify the command by adding the *X-Amz-Target*, we also need to specify the *Content-Type* since it's an AWS specific type. Below is a screenshot that shows how the headers should look.
+This will require us to make a POST call to *https://cognito-idp.us-east-1.amazonaws.com*. The region will change depending on where you created your User Pool. We specify the command by adding the *X-Amz-Target*, we also need to specify the *Content-Type* since it's an AWS specific type. Below is a screenshot that shows how the headers should look.
+
 ![Postman request headers](/img/api-cognito-user-password/postman-headers.png)
 
 The body requires the following parameters:
-* AuthFlow - This is where we specify that we want to use the user-password flow by setting a value of *USER_PASSWORD_AUTH*
-* ClientId - We will set the value to the one we grabbed in step 1.
-* AuthParameters - in the object we will provide the *USERNAME* and the *PASSWORD* of our user.
+* *AuthFlow* - This is where we specify that we want to use the user-password flow by setting a value of *USER_PASSWORD_AUTH*
+* *ClientId* - We will set the value to the one we grabbed in step 1.
+* *AuthParameters* - in the object we will provide the *USERNAME* and the *PASSWORD* of our user.
 
 ![Postman request body](/img/api-cognito-user-password/postman-body.png)
 
-When you send this request you should get a response back with the *AccessToken*, *IdToken*, *RefreshToken*, *TokenType* and *ExpiresIn*. This also returns the *ChallengeParameters* but this flow does not require any challenge responses to be generated. (I've edited the full response from the picture before to not expose the full keys).
+When you send this request you should get a response back with the *AccessToken*, *IdToken*, *RefreshToken*, *TokenType* and *ExpiresIn*. This also returns the *ChallengeParameters* but this flow does not require any challenge responses to be generated. (I've edited the full response from the picture to not expose the full keys).
 
 ![Postman response body](/img/api-cognito-user-password/postman-response.png)
 
@@ -133,8 +133,7 @@ Grabbing the *IdToken* from the response we got from the request above we can no
 
 ![Postman auth config and successful request](/img/api-cognito-user-password/postman-authorization-configuration.png)
 
-
-## Authenticating for automation
+## Authenticating automation calls
 Whenever I change authentication methods I get stuck setting it all up for my test automation. This requires us to do the same thing we did in Postman but programmatically. I am doing this by running a small NodeJS script that will make the call as shown below.
 
 ```javascript
@@ -159,10 +158,10 @@ const initiateAuthResponse = await axios({
   const token = initiateAuthResponse.data.AuthenticationResult.IdToken;
 ```
 
-If you look at the code above it should seem very familiar to what we did in Postman. Making a POST request with the necessary headers and body. Once you get the response you can do whatever you need in your automation.
+If you look at the code above it should seem very familiar to what we did in Postman. Making a POST request with the necessary headers and body. Once you get the response you can do whatever you need with the tokens.
 
-I've provided 3 examples on how to handle the user credentials for this script.
-1. Create user programmatically - In this example we are [creating a Cognito user programmatically](https://www.andmore.dev/blog/create-cognito-user-programatically/) and using these credentials to authenticate by setting them as environment variables using the *>> $GITHUB_ENV* command. At the end of the run we delete the user so we don't have an endless amount of orphaned automation users.
+I've provided 2 examples on how to handle the user credentials for this script to use.
+1. Create user programmatically - In this example we are [creating a Cognito user programmatically](https://www.andmore.dev/blog/create-cognito-user-programatically/) and using the credentials to authenticate. We do this by setting the values as environment variables using the *>> $GITHUB_ENV* command. At the end of the run we delete the user so we don't have an endless amount of orphaned automation users.
 ```yaml
   test-api-with-user-password-auth-inline-create-user:
     name: Run Portman With USER_PASSWORD_AUTH - Inline Create User
@@ -205,7 +204,7 @@ I've provided 3 examples on how to handle the user credentials for this script.
 ```
 
 1. Use GitHub Secrets - 
-This is one of the simpler routes but requires you to copy and paste all your secrets into GitHub which might be a concern for some people. All you need to do is reference the secrets in the GitHub workflow
+This is one of the simpler routes but requires to have a user already set up. All you need to do is store the credentials in GitHub secrets and reference them in the workflow.
 ```yaml
   test-api-with-user-password-auth-github-secrets:
     name: Run Portman With USER_PASSWORD_AUTH - Load GitHub Secrets
@@ -235,6 +234,8 @@ This is one of the simpler routes but requires you to copy and paste all your se
           node ./portman/get-auth-token/user-password-auth.mjs
           npx @apideck/portman --cliOptionsFile portman/portman-cli.json --baseUrl ${{ inputs.BASE_URL }}
 ```
+
+There are two considerations to take into account here. If you are going to have a user per repository it might become a burden to maintain these users as your applications and repositories grow. On the other hand, if you share a single user with all your repos you might be introducing security vulnerabilities since it will be easier to have this password compromised. 
 
 ## Wrap Up
 In this post we were able to update our authentication to use the user-password flow instead of M2M for our APIs, this allows us to stay within the Cognito free tier. We were able to verify that we can still authenticate with Postman as well as in the test automations. Hopefully this shows the flexibility there is with Cognito and how you can configure it differently to satisfy your use cases.
