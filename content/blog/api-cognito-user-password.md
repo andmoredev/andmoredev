@@ -52,10 +52,10 @@ Unlike our M2M setup that didn't need any properties for the user pool, for this
 ```
 
 The user pool attributes are:
-* *UsernameAttributes* - this is specifying what you allow as a user name. The options here are *email* or *phone_number*
-* *AutoVerifiedAttributes* - attributes that you allow to be verified automatically by Cognito. For example we are using *email* this means Cognito will automatically send a verification email to the user. If we didn't set this attribute an administrator would have to manually verify users in Cognito.
-* *VerificationMessageTemplate* - This is where you can set your own template for the email that will get sent to users to verify. For this example we are using a default option provided by Cognito where they will confirm by clicking a link. The other option is *CONFIRM_WITH_CODE* where a user will receive a code and they have to enter it manually to verify.
-* *EmailConfiguration* - This property allows us to setup the configuration for the sender email for the verification or any other communications happening from Cognito. In our case we are using *COGNITO_DEFAULT* which reduces the amount of setup we need to get an Amazon SES verified email. The *COGNITO_DEFAULT* has some [limits](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) that you will need to consider if you are using it.
+* **UsernameAttributes** - this is specifying what you allow as a user name. The options here are *email* or *phone_number*
+* **AutoVerifiedAttributes** - attributes that you allow to be verified automatically by Cognito. For example we are using *email* this means Cognito will automatically send a verification email to the user. If we didn't set this attribute an administrator would have to manually verify users in Cognito.
+* **VerificationMessageTemplate** - This is where you can set your own template for the email that will get sent to users to verify. For this example we are using a default option provided by Cognito where they will confirm by clicking a link. The other option is *CONFIRM_WITH_CODE* where a user will receive a code and they have to enter it manually to verify.
+* **EmailConfiguration** - This property allows us to setup the configuration for the sender email for the verification or any other communications happening from Cognito. In our case we are using *COGNITO_DEFAULT* which reduces the amount of setup we need to get an Amazon SES verified email. The *COGNITO_DEFAULT* has some [limits](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) that you will need to consider if you are using it.
 
 ### API Stack
 Our API Stack is simplified when using this flow. Why? We do not need to create a resource server since we will not be using OAuth capabilities. 
@@ -84,11 +84,11 @@ Below is the definition for our user pool client.
 ```
 
 I few changes need to be done in order for this authentication flow to work. 
-* *GenerateSecret* - We first get rid of this property since it is not needed for this flow.
-* *AllowedOAuthFlows* - When using the User/Password auth flow we do not need to set this property.
-* *AllowedOAuthScopes* - Since we are not using an OAuth flow we do not need to set up scopes.
-* *SupportedIdentityProviders* - We are going to use *COGNITO* as our only provider. You can configure different identity providers to simplify your users sign in by using Google, Facebook or any of the supported providers.
-* *ExplicitAuthFlows*: this is where we will configure the *ALLOW_USER_PASSWORD_AUTH* which will allow us to authenticate using a username and a password. I've added *ALLOW_REFRESH_TOKEN_AUTH* since it's required but we will not be going to do token refreshes in this post.
+* **GenerateSecret** - We first get rid of this property since it is not needed for this flow.
+* **AllowedOAuthFlows** - When using the User/Password auth flow we do not need to set this property.
+* **AllowedOAuthScopes** - Since we are not using an OAuth flow we do not need to set up scopes.
+* **SupportedIdentityProviders** - We are going to use *COGNITO* as our only provider. You can configure different identity providers to simplify your users sign in by using Google, Facebook or any of the supported providers.
+* **ExplicitAuthFlows**: this is where we will configure the *ALLOW_USER_PASSWORD_AUTH* which will allow us to authenticate using a username and a password. I've added *ALLOW_REFRESH_TOKEN_AUTH* since it's required but we will not be going to do token refreshes in this post.
 
 #### 4. Updates to API Gateway
 The only thing that needs to change in the API Gateway is the removal of the *AuthorizationScopes*. For this flow this is not needed.
@@ -118,9 +118,9 @@ This will require us to make a POST call to *https://cognito-idp.us-east-1.amazo
 ![Postman request headers](/img/api-cognito-user-password/postman-headers.png)
 
 The body requires the following parameters:
-* *AuthFlow* - This is where we specify that we want to use the user-password flow by setting a value of *USER_PASSWORD_AUTH*
-* *ClientId* - We will set the value to the one we grabbed in step 1.
-* *AuthParameters* - in the object we will provide the *USERNAME* and the *PASSWORD* of our user.
+* **AuthFlow** - This is where we specify that we want to use the user-password flow by setting a value of *USER_PASSWORD_AUTH*
+* **ClientId** - We will set the value to the one we grabbed in step 1.
+* **AuthParameters** - in the object we will provide the *USERNAME* and the *PASSWORD* of our user.
 
 ![Postman request body](/img/api-cognito-user-password/postman-body.png)
 
