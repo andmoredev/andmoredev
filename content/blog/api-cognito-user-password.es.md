@@ -2,7 +2,7 @@
 title = "Usando Amazon Cognito con el flujo de autenticación de usuario-contraseña"
 date = 2024-05-15T00:00:00-00:00
 draft = false
-description = "En mayo publiqué un artículo sobre cómo asegurar las API utilizando la autenticación de máquina a máquina. Justo un día después, AWS Cognito cambió su modelo de precios y ahora mi solución propuesta incurriría en costos. En este artículo, explicaré una configuración diferente utilizando el flujo de autenticación de usuario-contraseña. Esto nos permitirá autenticarnos desde automatizaciones y desde Postman, manteniéndonos en el nivel gratuito."
+description = "En mayo publiqué un artículo sobre cómo asegurar las API utilizando la autenticación de máquina a máquina. Justo un día después, AWS Cognito cambió su modelo de precios y ahora mi solución propuesta generaria costos para mí. En este artículo, explicaré una configuración diferente utilizando el flujo de autenticación de usuario-contraseña. Esto nos permitirá autenticarnos desde automatizaciones y desde Postman, manteniéndonos en la capa gratuita."
 tags = ["AWS", "Seguridad", "SAM"]
 [[images]]
   src = "img/api-cognito-user-password/title-es.png"
@@ -19,20 +19,20 @@ Inicialmente pensé que podría usar [Autenticación Básica](https://en.wikiped
 
 Vamos a profundizar en cada interacción:
 1. El solicitante realiza una solicitud con el nombre de usuario y la contraseña a su API.
-2. La API realiza una llamada a Cognito para obtener los tokens de acceso, identificación y actualización, y los devuelve al usuario.
-3. El usuario proporciona el token de identificación en el encabezado de autorización con cada llamada a la API.
+2. La API realiza una llamada a Cognito para obtener los tokens de acceso, id y refresh, y los devuelve al usuario.
+3. El usuario proporciona el token de id en el encabezado de autorización con cada llamada a la API.
 4. La API verifica el token con Cognito para asegurarse de que sea válido.
 
 ## Configurándolo todo con SAM
-Vamos a mantener la misma arquitectura para los recursos de Amazon Cognito para simplificar la configuración de cada API y poder administrar los usuarios desde un único lugar.
+Vamos a mantener la misma arquitectura para los recursos de Amazon Cognito para simplificar la configuración de cada API y poder administrar los usuarios desde un solo lugar.
 
 ![Arquitectura de la pila de CloudFormation](/img/api-cognito-user-password/stack-architecture.png)
 
 Ahora veamos cómo se configura cada una de estas piezas utilizando SAM.
 
-### Pila de Autenticación
-Esta pila tiene los recursos que serán consumidos por nuestras pilas de API.
-La configuración completa de la pila de autenticación se puede encontrar [en este repositorio de GitHub](https://github.com/andmoredev/cognito-auth).
+### Stack de auth
+Este stack tiene los recursos que serán consumidos por nuestras stacks de API.
+La configuración completa de la stack de autenticación se puede encontrar [en este repositorio de GitHub](https://github.com/andmoredev/cognito-auth).
 
 #### 1. Actualizaciones en el Grupo de Usuarios
 A diferencia de nuestra configuración de M2M que no necesitaba ninguna propiedad para el grupo de usuarios, para este tipo de autenticación necesitamos configurar propiedades que especifiquen los atributos que se alojarán para el usuario, como el correo electrónico, los nombres, etc.
@@ -54,10 +54,10 @@ Los atributos del grupo de usuarios son:
 * **UsernameAttributes** - esto especifica qué se permite como nombre de usuario. Las opciones aquí son *email* o *phone_number*.
 * **AutoVerifiedAttributes** - atributos que se permiten verificar automáticamente por Cognito. Por ejemplo, estamos usando *email*, lo que significa que Cognito enviará automáticamente un correo electrónico de verificación al usuario. Si no configuramos este atributo, un administrador tendría que verificar manualmente a los usuarios en Cognito.
 * **VerificationMessageTemplate** - aquí puedes configurar tu propia plantilla para el correo electrónico que se enviará a los usuarios para verificar. En este ejemplo, estamos utilizando una opción predeterminada proporcionada por Cognito donde los usuarios confirmarán haciendo clic en un enlace. La otra opción es *CONFIRM_WITH_CODE*, donde el usuario recibirá un código y deberá ingresarlo manualmente para verificar.
-* **EmailConfiguration** - esta propiedad nos permite configurar la configuración del correo electrónico del remitente para la verificación u otras comunicaciones que ocurran desde Cognito. En nuestro caso, estamos utilizando *COGNITO_DEFAULT*, lo que reduce la cantidad de configuración necesaria para obtener un correo electrónico verificado de Amazon SES. *COGNITO_DEFAULT* tiene algunos [límites](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) que debes tener en cuenta si lo estás utilizando.
+* **EmailConfiguration** - esta propiedad nos permite configurar el correo electrónico del remitente para la verificación u otras comunicaciones que ocurran desde Cognito. En nuestro caso, estamos utilizando *COGNITO_DEFAULT*, lo que reduce la cantidad de configuración necesaria para obtener un correo electrónico verificado de Amazon SES. *COGNITO_DEFAULT* tiene algunos [límites](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) que debes tener en cuenta si lo estás utilizando.
 
-### Pila de API
-Nuestra pila de API se simplifica al utilizar este flujo. ¿Por qué? No necesitamos crear un servidor de recursos ya que no utilizaremos capacidades de OAuth.
+### Stack de API
+Nuestra stack de API se simplifica al utilizar este flujo. ¿Por qué? No necesitamos crear un servidor de recursos ya que no utilizaremos capacidades de OAuth.
 
 #### 1. Eliminar UserPoolResourceServer
 Como mencioné antes, ya no necesitamos este recurso. Así que deshazte de él eliminándolo de la plantilla.
@@ -85,7 +85,7 @@ A continuación se muestra la definición de nuestro cliente del grupo de usuari
 Se deben realizar algunos cambios para que este flujo de autenticación funcione.
 * **GenerateSecret** - Primero eliminamos esta propiedad ya que no es necesaria para este flujo.
 * **AllowedOAuthFlows** - Cuando se utiliza el flujo de autenticación de usuario/contraseña, no es necesario configurar esta propiedad.
-* **AllowedOAuthScopes** - Como no estamos utilizando un flujo de OAuth, no es necesario configurar los ámbitos.
+* **AllowedOAuthScopes** - Como no estamos utilizando un flujo de OAuth, no es necesario configurar los scopes.
 * **SupportedIdentityProviders** - Vamos a utilizar *COGNITO* como nuestro único proveedor. Puedes configurar diferentes proveedores de identidad para simplificar el inicio de sesión de tus usuarios utilizando Google, Facebook o cualquiera de los proveedores admitidos.
 * **ExplicitAuthFlows**: aquí configuraremos *ALLOW_USER_PASSWORD_AUTH*, que nos permitirá autenticarnos utilizando un nombre de usuario y una contraseña. También he agregado *ALLOW_REFRESH_TOKEN_AUTH* ya que es necesario, pero no vamos a hacer actualizaciones de tokens en este artículo.
 
@@ -102,6 +102,8 @@ Lo único que necesita cambiar en API Gateway es la eliminación de *Authorizati
 ```
 
 ¡¡Eso es todo!! Ahora hemos configurado con éxito todo lo necesario para autenticar nuestra API utilizando el flujo de usuario-contraseña.
+
+[En este repositorio de GitHub](https://github.com/andmoredev/api-gateway-auth-with-cognito) puedes ver el ejemplo completo.
 
 ## Pruebas con Postman
 
@@ -128,7 +130,7 @@ Cuando envíes esta solicitud, deberías recibir una respuesta con el *AccessTok
 ![Cuerpo de la respuesta en Postman](/img/api-cognito-user-password/postman-response.png)
 
 ### 5. Realizar una solicitud
-Tomando el *IdToken* de la respuesta que obtuvimos en la solicitud anterior, ahora podemos usarlo para autorizar la solicitud al punto de conexión de la API, como se muestra a continuación.
+Tomando el *IdToken* de la respuesta que obtuvimos en la solicitud anterior, ahora podemos usarlo para autorizar la solicitud  como se muestra a continuación.
 
 ![Configuración de autorización y solicitud exitosa en Postman](/img/api-cognito-user-password/postman-authorization-configuration.png)
 
@@ -160,7 +162,7 @@ const initiateAuthResponse = await axios({
 Si observas el código anterior, debería resultarte muy familiar a lo que hicimos en Postman. Realizando una solicitud POST con los encabezados y el cuerpo necesarios. Una vez que obtengas la respuesta, puedes hacer lo que necesites con los tokens.
 
 He proporcionado 2 ejemplos de cómo manejar las credenciales de usuario para que este script las utilice.
-1. Crear usuario programáticamente: en este ejemplo, estamos [creando un usuario de Cognito programáticamente](https://www.andmore.dev/blog/create-cognito-user-programatically/) y utilizando las credenciales para autenticarnos. Hacemos esto configurando los valores como variables de entorno utilizando el comando *>> $GITHUB_ENV*. Al final de la ejecución, eliminamos el usuario para no tener una cantidad infinita de usuarios de automatización huérfanos.
+1. Crear usuario programáticamente: en este ejemplo, estamos [creando un usuario de Cognito programáticamente](https://www.andmore.dev/es/blog/create-cognito-user-programatically/) y utilizando las credenciales para autenticarnos. Hacemos esto configurando los valores como variables de entorno utilizando el comando *>> $GITHUB_ENV*. Al final de la ejecución, eliminamos el usuario para no tener una cantidad infinita de usuarios de automatización huérfanos.
 ```yaml
   test-api-with-user-password-auth-inline-create-user:
     name: Ejecutar Portman con USER_PASSWORD_AUTH - Crear usuario en línea
@@ -203,7 +205,7 @@ He proporcionado 2 ejemplos de cómo manejar las credenciales de usuario para qu
 ```
 
 2. Usar secretos de GitHub: 
-Esta es una de las rutas más simples, pero requiere tener un usuario ya configurado. Todo lo que necesitas hacer es almacenar las credenciales en los secretos de GitHub y hacer referencia a ellos en el flujo de trabajo.
+Esta es una de las rutas más simples, pero requiere tener un usuario ya configurado. Todo lo que necesitas hacer es almacenar las credenciales en los secretos de GitHub y hacer referencia a ellos en el flujo.
 ```yaml
   test-api-with-user-password-auth-github-secrets:
     name: Ejecutar Portman con USER_PASSWORD_AUTH - Cargar secretos de GitHub
@@ -237,5 +239,5 @@ Esta es una de las rutas más simples, pero requiere tener un usuario ya configu
 Aquí hay dos consideraciones a tener en cuenta. Si vas a tener un usuario por repositorio, puede resultar una carga mantener estos usuarios a medida que crecen tus aplicaciones y repositorios. Por otro lado, si compartes un solo usuario con todos tus repositorios, podrías estar introduciendo vulnerabilidades de seguridad, ya que será más fácil comprometer esta contraseña.
 
 ## Conclusión
-En este artículo hemos actualizado nuestra autenticación para utilizar el flujo de usuario-contraseña en lugar de M2M para nuestras API, lo que nos permite mantenernos dentro del nivel gratuito de Cognito. Hemos verificado que aún podemos autenticarnos con Postman y nuestras pruebas automatizadas. Espero que esto muestre la flexibilidad que ofrece Cognito y cómo puedes configurarlo de manera diferente para satisfacer tus casos de uso. Exploraré los otros flujos de autenticación para que puedas elegir fácilmente el que tenga más sentido para ti.
+En este artículo hemos actualizado nuestra autenticación para utilizar el flujo de usuario-contraseña en lugar de M2M para nuestras API, lo que nos permite mantenernos dentro de la capa gratuita de Cognito. Hemos verificado que aún podemos autenticarnos con Postman y nuestras pruebas automatizadas. Espero que esto muestre la flexibilidad que ofrece Cognito y cómo puedes configurarlo de manera diferente para satisfacer tus casos de uso. Exploraré los otros flujos de autenticación para que puedas elegir fácilmente el que tenga más sentido para ti.
 

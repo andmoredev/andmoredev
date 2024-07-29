@@ -2,7 +2,7 @@
 title = "Using Amazon Cognito with the user-password flow"
 date = 2024-05-15T00:00:00-00:00
 draft = false
-description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would incur cost. In this post I will go through a different setup using the user-password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
+description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would generate cost for me. In this post I will go through a different setup using the user-password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
 tags = ["AWS", "Security", "SAM"]
 [[images]]
   src = "img/api-cognito-user-password/title.png"
@@ -13,7 +13,7 @@ tags = ["AWS", "Security", "SAM"]
 On my post called [Secure API Gateway with Amazon Cognito using SAM](https://www.andmore.dev/blog/api-cognito/) I talked about different Auth terms and walked through a setup to use the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow), but Cognito recently introduced [pricing changes for machine-to-machine authentication](https://aws.amazon.com/about-aws/whats-new/2024/05/amazon-cognito-tiered-pricing-m2m-usage/) that will make this cost us and my main goal is to do this while staying in the free tier for personal projects that will not be generating any income. That is why in this post I am going to setup Amazon Cognito using a different flow called user password-based authentication. With this type of authentication we are charged based on the Monthly Active Users (MAUs) and AWS gives you the first 50,000 MAUs for free, and in my case this will usually stay at 1 per project, so I should be fine.
 
 ## How does the user-password flow work?
-Initially I thought I could use [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header but that is now how this works. In the image below I have all the interactions that happen to get an authenticated request.
+Initially I thought I could use [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header but that is not the case. In the image below I have a picture that shows the interactions that happen to get an authenticated request using this flow.
 
 ![Authentication flow interactions](/img/api-cognito-user-password/USER_PASSWORD_AUTH-flow-summary.png)
 
@@ -52,7 +52,7 @@ Unlike our M2M setup that didn't need any properties for the user pool, for this
 ```
 
 The user pool attributes are:
-* **UsernameAttributes** - this is specifying what you allow as a user name. The options here are *email* or *phone_number*
+* **UsernameAttributes** - this is specifying what you allow as a user name. The options here are *email* or *phone_number*.
 * **AutoVerifiedAttributes** - attributes that you allow to be verified automatically by Cognito. For example we are using *email* this means Cognito will automatically send a verification email to the user. If we didn't set this attribute an administrator would have to manually verify users in Cognito.
 * **VerificationMessageTemplate** - This is where you can set your own template for the email that will get sent to users to verify. For this example we are using a default option provided by Cognito where they will confirm by clicking a link. The other option is *CONFIRM_WITH_CODE* where a user will receive a code and they have to enter it manually to verify.
 * **EmailConfiguration** - This property allows us to setup the configuration for the sender email for the verification or any other communications happening from Cognito. In our case we are using *COGNITO_DEFAULT* which reduces the amount of setup we need to get an Amazon SES verified email. The *COGNITO_DEFAULT* has some [limits](https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html) that you will need to consider if you are using it.
@@ -60,7 +60,7 @@ The user pool attributes are:
 ### API Stack
 Our API Stack is simplified when using this flow. Why? We do not need to create a resource server since we will not be using OAuth capabilities. 
 
-#### 1. Delete UserPoolResourceServer
+#### 1. Delete *UserPoolResourceServer*
 As mentioned before, we don't need this resource anymore. So let's get rid of it from our stack by removing it from the template.
 
 #### 2. User Pool Client Updates
@@ -83,7 +83,7 @@ Below is the definition for our user pool client.
 +       - ALLOW_REFRESH_TOKEN_AUTH
 ```
 
-I few changes need to be done in order for this authentication flow to work. 
+A few changes need to be done in order for this authentication flow to work. 
 * **GenerateSecret** - We first get rid of this property since it is not needed for this flow.
 * **AllowedOAuthFlows** - When using the User/Password auth flow we do not need to set this property.
 * **AllowedOAuthScopes** - Since we are not using an OAuth flow we do not need to set up scopes.
@@ -102,7 +102,9 @@ The only thing that needs to change in the API Gateway is the removal of the *Au
 -         - layerless-esbuild/echo
 ```
 
-THAT'S IT!! We have now successfully setup everything needed to authenticate our API using the user-password flow.
+THAT'S IT!! We have now successfully setup our API to authenticate using the user-password flow.
+
+You can find the full working example in this [GitHub repository](https://github.com/andmoredev/api-gateway-auth-with-cognito)
 
 ## Testing with Postman
 
@@ -160,7 +162,7 @@ const initiateAuthResponse = await axios({
 
 If you look at the code above it should seem very familiar to what we did in Postman. Making a POST request with the necessary headers and body. Once you get the response you can do whatever you need with the tokens.
 
-I've provided 2 examples on how to handle the user credentials for this script to use.
+I've provided 2 examples on how to handle the user credentials for this script to use within a CI/CD pipeline.
 1. Create user programmatically - In this example we are [creating a Cognito user programmatically](https://www.andmore.dev/blog/create-cognito-user-programatically/) and using the credentials to authenticate. We do this by setting the values as environment variables using the *>> $GITHUB_ENV* command. At the end of the run we delete the user so we don't have an endless amount of orphaned automation users.
 ```yaml
   test-api-with-user-password-auth-inline-create-user:
