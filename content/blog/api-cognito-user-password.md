@@ -1,8 +1,8 @@
 +++
-title = "Secure API Gateway with Amazon Cognito using SAM - User Password Flow"
+title = "Using Amazon Cognito with the user-password flow"
 date = 2024-05-15T00:00:00-00:00
 draft = false
-description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would incur cost. In this post I will go through a different setup using the user password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
+description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would incur cost. In this post I will go through a different setup using the user-password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
 tags = ["AWS", "Security", "SAM"]
 [[images]]
   src = "img/api-cognito-user-password/title.png"
@@ -12,7 +12,7 @@ tags = ["AWS", "Security", "SAM"]
 
 On my post called [Secure API Gateway with Amazon Cognito using SAM](https://www.andmore.dev/blog/api-cognito/) I talked about different Auth terms and walked through a setup to use the [Client Credentials Flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-credentials-flow), but Cognito recently introduced [pricing changes for machine-to-machine authentication](https://aws.amazon.com/about-aws/whats-new/2024/05/amazon-cognito-tiered-pricing-m2m-usage/) that will make this cost us and my main goal is to do this while staying in the free tier for personal projects that will not be generating any income. That is why in this post I am going to setup Amazon Cognito using a different flow called user password-based authentication. With this type of authentication we are charged based on the Monthly Active Users (MAUs) and AWS gives you the first 50,000 MAUs for free, and in my case this will usually stay at 1 per project, so I should be fine.
 
-## How does the user password flow work?
+## How does the user-password flow work?
 Initially I thought I could use [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) where you provide the encoded username and password in the *Authorization* header but that is now how this works. In the image below I have all the interactions that happen to get an authenticated request.
 
 ![Authentication flow interactions](/img/api-cognito-user-password/USER_PASSWORD_AUTH-flow-summary.png)
@@ -238,4 +238,4 @@ This is one of the simpler routes but requires to have a user already set up. Al
 There are two considerations to take into account here. If you are going to have a user per repository it might become a burden to maintain these users as your applications and repositories grow. On the other hand, if you share a single user with all your repos you might be introducing security vulnerabilities since it will be easier to have this password compromised. 
 
 ## Wrap Up
-In this post we were able to update our authentication to use the user-password flow instead of M2M for our APIs, this allows us to stay within the Cognito free tier. We were able to verify that we can still authenticate with Postman as well as in the test automations. Hopefully this shows the flexibility there is with Cognito and how you can configure it differently to satisfy your use cases.
+In this post we were able to update our authentication to use the user-password flow instead of M2M for our APIs, this allows us to stay within the Cognito free tier. We were able to verify that we can still authenticate with Postman and our test automations. Hopefully this shows the flexibility there is with Cognito and how you can configure it differently to satisfy your use cases. I will be exploring the other authentication flows so you can easily choose the one that makes more sense for you.
