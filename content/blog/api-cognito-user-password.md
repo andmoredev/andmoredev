@@ -37,7 +37,7 @@ Full auth stack setup can be found [in this GitHub repository](https://github.co
 
 #### 1. Updates to the User Pool
 Unlike our M2M setup that didn't need any properties for the user pool, for this type of authentication we need to setup properties that are specifying the attributes to be hosted for the user such as email, names, etc.
-```diff yaml
+```diff
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
 +   Properties:
