@@ -1,6 +1,6 @@
 +++
 title = "Usando Amazon Cognito con el flujo de autenticación de usuario-contraseña"
-date = 2024-05-15T00:00:00-00:00
+date = 2024-07-31T00:00:00-00:00
 draft = false
 description = "En mayo publiqué un artículo sobre cómo asegurar las API utilizando la autenticación de máquina a máquina. Justo un día después, AWS Cognito cambió su modelo de precios y ahora mi solución propuesta generaria costos para mí. En este artículo, explicaré una configuración diferente utilizando el flujo de autenticación de usuario-contraseña. Esto nos permitirá autenticarnos desde automatizaciones y desde Postman, manteniéndonos en la capa gratuita."
 tags = ["AWS", "Seguridad", "SAM"]

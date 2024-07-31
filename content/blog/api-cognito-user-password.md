@@ -1,6 +1,6 @@
 +++
 title = "Using Amazon Cognito with the user-password flow"
-date = 2024-05-15T00:00:00-00:00
+date = 2024-07-31T00:00:00-00:00
 draft = false
 description = "In May I released a post on how to secure APIs using machine-to-machine authentication. Exactly one day after that AWS Cognito changed their pricing model and now my proposed solution would generate cost for me. In this post I will go through a different setup using the user-password auth flow. This will still allow us to authenticate from automations and from Postman while keeping us in the free tier."
 tags = ["AWS", "Security", "SAM"]
