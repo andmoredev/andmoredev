@@ -58,7 +58,7 @@ disableLanguages        = []
       src                 = "img/main/logo.png"
       shape               = "circle"
       width               = ""
-      alt                 = "Andres Moreno Profile Pictrue"
+      alt                 = "Andres Moreno Profile Picture"
 
   [params.sidebar]
     about               = ""
