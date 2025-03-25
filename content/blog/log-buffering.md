@@ -81,7 +81,8 @@ Now to test we will add all the different types of logs to our Lambda handler li
 
 ```
 
-If we run the Lambda function and view the logs produced in CloudWatch, we get this:
+If we run the Lambda function and view the logs produced in CloudWatch, we get this:  
+
 ![Cloudwatch Logs](/img/log-buffering/logs-1.png)
 
 The results were a bit unexpected to me, but then I went back and looked at the default values for the logger options to try and understand this better. There are two default values to keep in mind for this example, the **flushOnErrorLog** is enabled by default and the default log level for the buffer is DEBUG. With this let's understand why the logs show in this specific order.
