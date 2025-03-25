@@ -57,8 +57,7 @@ But now the question is, what happens if I didn't catch and log an error? Will I
 *  **flushBufferOnUncaughtError*** - *This option is only allowed when you are injecting the Lambda context into the logger. You can use this to flush logs when there is an uncaught error. What this property will do is to flush the logs whenever the Lambda function encounters any error and is not caught.
 * **flush_buffer function** - You might want to flush the logs whenever a specific code path is hit or other scenarios that are specific for your use case. To do this, the logger has a new function called *flush_buffer *that will take care of sending all of the buffered logs into CloudWatch manually.
 
-### Demo
-Let's see this in action!
+### Let's see this in action!
 
 **Enable log buffering**
 To enable this feature all we have to do is set the enabled property to true in the logBufferOptions object for the Logger constructor as shown below:
