@@ -17,7 +17,7 @@ This is what the Lambda Powertools documentation says:
 
 > Log buffering enables you to buffer logs for a specific request or invocation. Enable log buffering by passing **logBufferOptions** when initializing a Logger instance. You can buffer logs at the **WARNING**, **INFO**,  **DEBUG**, or **TRACE** level, and flush them automatically on error or manually as needed.
 
-The three main terms from that explanation are *buffering, level, *and *flush. *Let's explain each of these in the context of log buffering.
+The three main terms from that explanation are *buffering*, *level*, and *flush*. Let's explain each of these in the context of log buffering.
 
 * **Buffering**—This means that the Lambda function will hold the logs in memory without sending them to CloudWatch unless necessary.
 * **Level** - The log level at which you want to start buffering the logs. You can choose which level to begin buffering at. For example, if you configure the log buffer to do it at the INFO level, it will buffer those logs and any log levels with a lower value. In this case, it will also buffer TRACE and DEBUG. Below are all the supported log levels and their numeric value.
