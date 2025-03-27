@@ -5,7 +5,7 @@ draft = false
 description = ""
 tags = ["AWS", "Serverless", "Lambda", "Powertools"]
 [[images]]
-  src = "img/update-commonjs-to-esm/title.jpg"
+  src = "img/log-buffering/title.jpg"
   alt = ""
   stretch = "stretchH"
 +++
