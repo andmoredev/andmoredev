@@ -51,9 +51,8 @@ But now the question is, what happens if I don't catch and log an error? Will I 
 
 ### Let's see this in action!
 
-**Enable log buffering**
 To enable this feature, all we have to do is set the enabled property to true in the logBufferOptions object for the Logger constructor, as shown below:
-"`javascript
+```javascript
 export const logger = new Logger({
   logBufferOptions: {
     enabled: true
@@ -89,9 +88,8 @@ If we were to run the same test but, in this scenario, don't log an error, we wo
 
 From the image above, we can see that only the non-buffered logs made it to CloudWatch, meaning that if there is no error, we won't see or get charged for the buffered logs.
 
-**Set log level**
 Now, let's configure the logger to buffer at the WARN level.
-"`javascript
+```javascript
 export const logger = new Logger({
   logBufferOptions: {
     enabled: true,
@@ -136,7 +134,7 @@ When we run this, Lambda Powertools will let us know that we've exceeded the buf
 ![CloudWatch Logs](/img/log-buffering/logs-3.png)
 
 What happens if a single log exceeds the buffer's size? Well, let's try it. To do this, I will set the maxBytes property to 1 byte.
-"`javascript
+```javascript
 export const logger = new Logger({
   logBufferOptions: {
     enabled: true,
