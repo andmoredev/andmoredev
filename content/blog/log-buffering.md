@@ -2,15 +2,15 @@
 title = "Log buffering with Lambda Powertools"
 date = 2025-03-18T00:00:00-00:00
 draft = false
-description = ""
+description = "Let's understand what log buffering is is, how it's configure in your Lambda Functions and see real results in CloudWatch by trying different configurations options."
 tags = ["AWS", "Serverless", "Lambda", "Powertools"]
 [[images]]
   src = "img/log-buffering/title.jpg"
-  alt = ""
+  alt = "Title image with Andres pointing to text that says Log Buffers with Powertools for AWS Lambda"
   stretch = "stretchH"
 +++
 
-The Lambda Powertools team released a new feature allowing your functions to buffer logs. That sounded cool, but I didn't understand how it would work or how logs would show in CloudWatch. I decided to try it out and provide a visual example of how it looks with different configuration options.
+The Lambda Powertools team released a new feature that allows your Lambda functions to buffer logs. That sounded cool, but I didn't understand how it would work or how logs would show in CloudWatch. I decided to try it out and provide a visual example of how it looks with different configuration options.
 
 ### What is log buffering?
 This is what the Lambda Powertools documentation says:
@@ -68,7 +68,6 @@ Now, to test, we will add all the different types of logs to our Lambda handler 
     logger.warn('Warn Log');
     logger.error('Error Log');
     logger.critical('Critical Log');
-
 ```
 
 If we run the Lambda function and view the logs produced in CloudWatch, we get this:  
