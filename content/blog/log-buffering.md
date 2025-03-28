@@ -46,7 +46,7 @@ There are a few pieces of configuration for buffer logging that can be set when 
 * **flushOnErrorLog**—This is a boolean value that tells the buffer to log whenever it encounters a *logger.error* call. When writing Lambda functions, we typically have a try/catch statement where we log any errors that get thrown. This helps automatically flush the logs when an error is caught and logged. The default value is *true.*
 
 But now the question is, what happens if I don't catch and log an error? Will I not be able to see the buffered logs? Thankfully, the Lambda Powertools team thought about this, and they allow you to flush the logs in two other ways:
-*  **flushBufferOnUncaughtError**—This option is only allowed when injecting the Lambda context into the logger. This property will flush the logs whenever the Lambda function encounters any error and is no explicitly handled by your code.
+*  **flushBufferOnUncaughtError**—This option is only allowed when injecting the Lambda context into the logger. This property will flush the logs whenever the Lambda function encounters any error and is not explicitly handled by your code.
 * **flushBuffer function**—You might want to flush the logs whenever a specific code path is hit or other scenarios that are specific for your use case. To do this, the logger has a new function called *flushBuffer* that will manually send all of the buffered logs into CloudWatch. 
 
 ### Let's see this in action!
