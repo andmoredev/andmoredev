@@ -1,6 +1,6 @@
 +++
 title = "Log buffering with Lambda Powertools"
-date = 2025-03-18T00:00:00-00:00
+date = 2025-03-28T00:00:00-00:00
 draft = false
 description = "Let's understand what log buffering is, how it's configured in your Lambda Functions and see real results in CloudWatch by trying different configuration options."
 tags = ["AWS", "Serverless", "Lambda", "Powertools"]
