@@ -5,7 +5,7 @@ draft = false
 description = "Vamos a entender qué es el búfer de logs, cómo se configura en tus funciones Lambda y a ver resultados reales en CloudWatch probando diferentes configuraciones."
 tags = ["AWS", "Serverless", "Lambda", "Powertools"]
 [[images]]
-  src = "img/log-buffering/title-es.png"
+  src = "img/log-buffering/title-es.jpg"
   alt = "Imagen de título con Andres señalando un texto que dice búfer de logs con powertools for AWS Lambda"
   stretch = "stretchH"
 +++
