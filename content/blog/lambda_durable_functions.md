@@ -1,7 +1,7 @@
 +++
 title = "Step Functions without ASL? Welcome Lambda Durable Functions"
 date = 2025-12-07T00:00:00-00:00
-draft = true
+draft = false
 description = "I've said regularly that AWS Step Functions is my favorite service, this all might be changing with the introduction of Lambda Durable Functions, read along to understand why."
 tags = ["AWS", "Serverless", "Lambda"]
 [[images]]
