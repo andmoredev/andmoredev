@@ -23,7 +23,7 @@ Let’s go over a few concepts around durable functions.
 * **Durable Context** - The context that is provided to the Lambda handler. This contains the methods for the durable operations.
 * **Durable Operations** - These are the operations that allow us to create a workflow within a Lambda function. Each step has built-in retries and automatically creates checkpoints when it runs. Let’s go over each of the operations at a high level.
     * **Steps** - Run business logic and are defined by using the `context.step()` operator.
-    * **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using `context.wait()` , `context.waitForCallback()` or `context.waitForContition()`.
+    * **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using `context.wait()` , `context.waitForCallback()` or `context.waitForCondition()`.
     * **Parallel** - There will be situations where you want to optimize for speed and run things concurrently to reduce execution time. The parallel operation is used for that, and is defined by using the `context.parallel()` operator.
     * **Iterations** - To process an array of items in a loop, you will have to use the `context.map()` operation.
     * **Invoke other Lambda functions** - You can invoke external Lambda functions from within a workflow. To do this, you will call the `context.invoke()` operator.
