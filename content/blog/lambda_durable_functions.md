@@ -2,7 +2,7 @@
 title = "Step Functions without ASL? Welcome Lambda Durable Functions"
 date = 2025-12-07T00:00:00-00:00
 draft = false
-description = "I've said regularly that AWS Step Functions is my favorite service, this all might be changing with the introduction of Lambda Durable Functions. We'll be going on a deep dive into durable functions and a step by step guide on how to get one up and running"
+description = "I've regularly said that AWS Step Functions is my favorite service, this all might be changing with the introduction of Lambda Durable Functions. We'll be going on a deep dive into durable functions and a step by step guide on how to set one up and running"
 tags = ["AWS", "Serverless", "Lambda"]
 [[images]]
   src = "img/lambda-durable-functions/title.png"
@@ -22,12 +22,12 @@ Let’s go over a few concepts around durable functions.
 * **Durable Execution** - The complete lifecycle of a durable function. From the moment it is triggered until it completes all defined steps and is closed.
 * **Durable Context** - The context that is provided to the Lambda handler. This contains the methods for the durable operations.
 * **Durable Operations** - These are the operations that allow us to create a workflow within a Lambda function. Each step has built-in retries and automatically creates checkpoints when it runs. Let’s go over each of the operations at a high level.
-* **Steps** - Run business logic and are defined by using the context.step() operator.
-* **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using context.wait() , context.waitForCallback() or context.waitForContition().
-* **Parallel** - There will be situations where you want to optimize for speed and run things concurrently to reduce execution time. The parallel operation is used for that, and is defined by using the context.parallel() operator.
-* **Iterations** - To process an array of items in a loop, you will have to use the context.map() operation.
-* **Invoke other Lambda functions** - You can invoke external Lambda functions from within a workflow. To do this, you will call the context.invoke() operator.
-* **Nested Operations** - To run operations as a child of another operation, you will call context.runInChildContext().
+    * **Steps** - Run business logic and are defined by using the context.step() operator.
+    * **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using context.wait() , context.waitForCallback() or context.waitForContition().
+    * **Parallel** - There will be situations where you want to optimize for speed and run things concurrently to reduce execution time. The parallel operation is used for that, and is defined by using the context.parallel() operator.
+    * **Iterations** - To process an array of items in a loop, you will have to use the context.map() operation.
+    * **Invoke other Lambda functions** - You can invoke external Lambda functions from within a workflow. To do this, you will call the context.invoke() operator.
+    * **Nested Operations** - To run operations as a child of another operation, you will call context.runInChildContext().
 
 ## How to create a Lambda durable function
 
