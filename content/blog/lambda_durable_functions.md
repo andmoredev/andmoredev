@@ -22,12 +22,12 @@ Let’s go over a few concepts around durable functions.
 * **Durable Execution** - The complete lifecycle of a durable function. From the moment it is triggered until it completes all defined steps and is closed.
 * **Durable Context** - The context that is provided to the Lambda handler. This contains the methods for the durable operations.
 * **Durable Operations** - These are the operations that allow us to create a workflow within a Lambda function. Each step has built-in retries and automatically creates checkpoints when it runs. Let’s go over each of the operations at a high level.
-    * **Steps** - Run business logic and are defined by using the context.step() operator.
-    * **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using context.wait() , context.waitForCallback() or context.waitForContition().
-    * **Parallel** - There will be situations where you want to optimize for speed and run things concurrently to reduce execution time. The parallel operation is used for that, and is defined by using the context.parallel() operator.
-    * **Iterations** - To process an array of items in a loop, you will have to use the context.map() operation.
-    * **Invoke other Lambda functions** - You can invoke external Lambda functions from within a workflow. To do this, you will call the context.invoke() operator.
-    * **Nested Operations** - To run operations as a child of another operation, you will call context.runInChildContext().
+    * **Steps** - Run business logic and are defined by using the `context.step()` operator.
+    * **Wait States** - Planned pauses that cause the function to stop running until they are resumed. This can be used to wait for a specific amount of time, for an external callback, or for other specific conditions. These are defined using `context.wait()` , `context.waitForCallback()` or `context.waitForContition()`.
+    * **Parallel** - There will be situations where you want to optimize for speed and run things concurrently to reduce execution time. The parallel operation is used for that, and is defined by using the `context.parallel()` operator.
+    * **Iterations** - To process an array of items in a loop, you will have to use the `context.map()` operation.
+    * **Invoke other Lambda functions** - You can invoke external Lambda functions from within a workflow. To do this, you will call the `context.invoke()` operator.
+    * **Nested Operations** - To run operations as a child of another operation, you will call `context.runInChildContext()`.
 
 ## How to create a Lambda durable function
 
@@ -55,7 +55,7 @@ Let’s go over these two properties in more detail:
 
 ### Code Handler Setup
 
-To make this simpler for us, AWS has provided a new SDK called @aws/durable-execution-sdk-js. This contains everything that you’ll need to build workflows in a Lambda function. But right now, the only thing we need to have a durable context is to wrap our handler with the withDurableExecution function.
+To make this simpler for us, AWS has provided a new SDK called @aws/durable-execution-sdk-js. This contains everything that you’ll need to build workflows in a Lambda function. But right now, the only thing we need to have a durable context is to wrap our handler with the `withDurableExecution` function.
 Yes, that is all!
 
 ```javascript
@@ -70,11 +70,11 @@ With those things in place, we can now define the workflow.
 
 ### Durable Operations
 
-Now I want to go through the different durable operations in detail and show them in a working example. If you want to follow along, I have everything defined and deployable at this GitHub location.
+Now I want to go through the different durable operations in detail and show them in a working example. If you want to follow along, I have everything defined and deployable in [this GitHub location](https://github.com/andmoredev/durable-functions/blob/main/workflows/durable-function-example/index.mjs).
 
 #### Step
 
-At its most basic level, we have the step. This will create a checkpoint after it’s run, and you can define any logic you want within the step. I recommend splitting the actual business logic outside of the workflow definition to keep it clean and readable. This makes it easy to follow when there are issues with your workflow, and you can easily find the step that broke.
+At its most basic level, we have the step. This will create a checkpoint after it’s run, and you can define any logic you want within the step. I recommend splitting the actual business logic outside of the workflow definition to keep it clean and readable. This makes it easy to follow when there are issues with your workflow, and you can find the step that broke.
 
 ```javascript
   // Step 1: Initial step operation - process input data
@@ -102,7 +102,7 @@ Whenever you want to wait for a human action, you will use the `waitForCallback`
   );
 ```
 
-This will give us a `callbackId` that we can use to resume our workflow. When testing, you can easily resume the workflow from the AWS Console, but in real life, you will need to do this programmatically. Thankfully, the SDK provides the SendDurableExecutionCallbackSuccessCommand and SendDurableExecutionCallbackFailureCommand in the Lambda client, which can be used to resume the workflow. You can also specify a timeout so the workflow does not wait forever.
+This will give us a `callbackId` that we can use to resume our workflow. When testing, you can resume the workflow from the AWS Console, but in real life, you will need to do this programmatically. Thankfully, the SDK provides the SendDurableExecutionCallbackSuccessCommand and SendDurableExecutionCallbackFailureCommand in the Lambda client, which can be used to resume the workflow. You can also specify a timeout so the workflow does not wait forever.
 
 Once the command is sent the workflow will resume and continue processing.
 
@@ -117,7 +117,7 @@ If you ever need to wait a specific amount of time, you can use the `wait` opera
 
 #### Parallel Processing
 
-When you have several operations that can be handled independently, you would want to run them in parallel to reduce the total processing time. That’s where the `parallel` operation comes in.
+When you have several operations that can be handled independently, you might want to run them in parallel to reduce the total processing time. That’s where the `parallel` operation comes in.
 
 ```javascript
   // Step 4: Parallel operations - process multiple work streams concurrently
@@ -136,7 +136,7 @@ When you have several operations that can be handled independently, you would wa
 
 This will attempt to run all three operations in parallel. If you are worried about putting too much load on another service, you can set `concurrency` limits so that not everything is processed at once.
 
-Iterate Arrays
+#### Iterate Arrays
 
 I always say that programming is all about `ifs` and `fors`. So how do you handle the `for` situation when working with durable functions? We have the `map` operator!
 
@@ -184,8 +184,8 @@ There is also a special wait operation that waits for a specific condition to be
 
 This has two parameters:
 
-1. WaitForConditionCheckFunc - Function that will check the current state and return the updated state.
-2. WaitForConditionConfig - Holds the configuration for the initial state and the wait strategy used to determine when it should continue and how long to delay before triggering WaitForConditionCheckFunc again.
+1. **WaitForConditionCheckFunc** - Function that will check the current state and return the updated state.
+2. **WaitForConditionConfig** - Holds the configuration for the initial state and the wait strategy used to determine when it should continue and how long to delay before triggering WaitForConditionCheckFunc again.
 
 #### Invoke Lambda Function
 
@@ -226,7 +226,7 @@ The `runInChildContext` operation creates an isolated execution context for a gr
   });
 ```
 
-#### Invoking & Troubleshooting
+### Invoking & Troubleshooting
 
 Once your durable function is deployed, you will want to invoke the function. Well, surprise, surprise, this is done exactly the same way you invoke any Lambda function, which means you can use all your regular event sources like API Gateway, EventBridge, and SQS. All of what I’m about to do can be done using the CLI, but for demo reasons, I will be using the console so we can get better visualizations.
 
@@ -234,7 +234,7 @@ When the Lambda is deployed with the `DurableConfig` you will see a new Durable 
 
 ![Durable executions tab](/img/lambda-durable-functions/durable-executions-tab.png)
 
-To add a new execution to the list, I simply invoked the function using the standard testing tool in the Lambda console.
+To create a new execution, I invoked the function using the standard testing tool in the Lambda console.
 
 Now, let’s look at the details of the execution.
 
@@ -242,10 +242,10 @@ Now, let’s look at the details of the execution.
 
 This view should look very similar to what we’ve seen in AWS Step Functions. It doesn’t have the nice workflow diagram, though. There are two sections here:
 
-1. Durable operations - here we will see all the operations that have been executed. In our example above, only two items appear because it has the human-in-the-loop step and is waiting for someone to respond with the callback ID. We will do that in a second.
-2. Event history - a more verbose list of what has happened. This is where you can track errors that occurred in a specific step and get a broader view of everything that was executed.
+1. **Durable operations** - here we will see all the operations that have been executed. In our example above, only two items appear because it has the human-in-the-loop step and is waiting for someone to respond with the callback ID. We will do that in a second.
+2. **Event history** - a more verbose list of what has happened. This is where you can track errors that occurred in a specific step and get a broader view of everything that was executed.
 
-Now, let me send the success message for the callback. I will be doing this directly from the console, as shown below. If you are looking for a way to do this programmatically, I’ve included a script here. This script will take in the callback ID and send a success message to continue the flow.
+Now, let me send the success message for the callback. I will be doing this directly from the console, as shown below. If you are looking for a way to do this programmatically, I’ve included a [script here](https://github.com/andmoredev/durable-functions/blob/main/scripts/resume-workflow.mjs). This script will take in the callback ID and send a success message to continue the flow.
 
 ![Callback send success button](/img/lambda-durable-functions/callback-success.png)
 
@@ -257,26 +257,26 @@ You’ll notice that some operations have explicit names and others have random 
 
 Let’s walk through the operations.
 
-* WaitForCallback - The duration was 9 minutes and 43 seconds. That is how long it took to write a few of the paragraphs above, and then press the “Send success” button.
-* Wait - As expected, this took the 5 seconds we had configured it for.
-* Parallel - This operation groups all sub-operations under it, making them easier to track.
+* **WaitForCallback** - The duration was 9 minutes and 43 seconds. That is how long it took to write a few of the paragraphs above, and then press the “Send success” button.
+* **Wait** - As expected, this took the 5 seconds we had configured it for.
+* **Parallel** - This operation groups all sub-operations under it, making them easier to track.
 
 ![Parallel operation](/img/lambda-durable-functions/parallel.png)
 
-* Map - Similarly to the parallel step, it will group all of the iterations under it.
+* **Map** - Similarly to the parallel step, it will group all of the iterations under it.
 
 ![Map operation](/img/lambda-durable-functions/map.png)
 
-* WaitForCondition - The special emphasis here is that it has a 2 in Retries. This means it had to iterate twice before the condition was met.
-* ChainedInvoke - Not too much to see for this step. It simply invoked the Lambda function and continued on.
-* RunInChildContext - This one also groups all the child operations under it.
+* **WaitForCondition** - The special emphasis here is that it has a 2 in Retries. This means it had to iterate twice before the condition was met.
+* **ChainedInvoke** - Not too much to see for this step. It simply invoked the Lambda function and continued on.
+* **RunInChildContext** - This one also groups all the child operations under it.
 ![Run in child context operation](/img/lambda-durable-functions/runinchildcontext.png)
 
 This allows you to see the different operations and how they look in the console. You can get this information using the CLI or the SDK, and create your own visualizations if necessary.
 
 ## Wrap Up
 
-Woah! That was a lot! We went over the setup to enable and deploy a durable function, as well as how to build a workflow that uses all of the currently supported durable operations.
+Woah! That was a lot! We went through the setup to enable and deploy a durable function, as well as how to build a workflow that uses all of the currently supported durable operations.
 
 The fact that I am now able to create long-running workflows where I can include any npm dependency directly without having to explicitly call external Lambda functions is a huge win compared to what we've been doing with Step Functions.
 
