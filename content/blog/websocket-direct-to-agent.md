@@ -10,11 +10,15 @@ tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore", "WebSocket"]
   stretch = "stretchH"
 +++
 
-Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by Amazon Bedrock AgentCore. The result: real-time streaming, lower latency, and a simpler data path without sacrificing security.
+I've been building AI agents for a while now, and streaming responses to a UI has always been the painful part. In previous projects I tried API Gateway streaming, Lambda response streaming, and even AppSync Events to notify the UI after tool calls (with a specific tool that I would tell the agent to use just to send updates to the frontend). I also looked at adding my own WebSocket API through API Gateway, which requires managing `$connect`, `$disconnect`, and `$default` routes, storing connection IDs in DynamoDB, and posting messages back through `@connections`. All of these approaches felt like too much ceremony for what should be simple.
 
-## The Problem with the Traditional Approach
+That's when I found that AgentCore has built-in WebSocket support. The browser can just connect directly to the agent. No middleman.
 
-Most AI chat applications follow a familiar pattern:
+I built WearCast, a weather-based clothing advisor powered by Amazon Bedrock AgentCore, specifically for my talk at AWS Community Day Midwest to demo this pattern. It turned out to be actually useful for me when packing for travel, and I have plans to extend it further for myself. Let me walk you through how it works.
+
+## The problem with the traditional approach
+
+Most AI chat applications follow this pattern:
 
 ```
 User → REST API → Lambda → AI Service → Lambda → REST API → User
@@ -22,13 +26,11 @@ User → REST API → Lambda → AI Service → Lambda → REST API → User
 
 Every message makes a round trip through multiple intermediaries. The response waits until the entire generation is complete, and then it all comes back at once. For a chat interface, this feels sluggish. Users stare at a spinner while the model generates hundreds of tokens they could already be reading.
 
-Even if you add Server-Sent Events or long-polling, you're still stitching together a real-time experience on top of infrastructure that wasn't designed for it.
+Even if you add Server-Sent Events or long-polling, you're still stitching together a real-time experience on top of infrastructure that wasn't designed for it. I wanted something better.
 
-What if we just... skipped the middleman?
+## The architecture
 
-## The Architecture: Browser ↔ Agent, Direct Connection
-
-Here's the core idea behind WearCast:
+Here's what I ended up with:
 
 ```
 ┌─────────────┐          ┌──────────────────┐
@@ -49,18 +51,20 @@ The browser connects directly to the AI agent over a WebSocket. No Lambda sits i
 
 The only time we touch traditional infrastructure is during the initial handshake, where we exchange a JWT for a presigned URL. After that, it's a direct, bidirectional pipe.
 
-## How It Works: The Three-Step Dance
+## How it works
 
-### Step 1: Authenticate the User (Cognito JWT)
+Let's go over the three steps to get this working.
 
-The user signs in through Amazon Cognito and receives a JWT token. This is standard, nothing unusual here.
+### Step 1: Authenticate the user
+
+The user signs in through Amazon Cognito and receives a JWT token. Nothing unusual here.
 
 ```typescript
 // Frontend authenticates and gets an access token
 const accessToken = await authService.getAccessToken();
 ```
 
-### Step 2: Exchange JWT for a Presigned WebSocket URL
+### Step 2: Exchange the JWT for a presigned WebSocket URL
 
 Here's where it gets interesting. The frontend makes a single REST call to our backend:
 
@@ -92,7 +96,7 @@ const presignedWsUrl = formatSignedUrl(signedRequest).replace('https://', 'wss:/
 
 The presigned URL is valid for 5 minutes, long enough to establish the connection, short enough to limit exposure.
 
-### Step 3: Connect Directly to the Agent
+### Step 3: Connect directly to the agent
 
 The browser opens a WebSocket connection using the presigned URL. No custom headers needed, all authentication is embedded in the URL's query parameters via SigV4.
 
@@ -122,36 +126,30 @@ ws.onmessage = (event) => {
 
 That's it. The browser is now talking directly to the AI agent. Every token streams in as it's generated. No Lambda in the hot path. No API Gateway managing frames.
 
-## Why This Matters
+## Why I like this approach
 
-### True Real-Time Streaming
+Let me go over what makes this better than the traditional setup.
 
-Every token arrives at the browser the moment the model generates it. There's no buffering layer, no Lambda invocation overhead per chunk, no API Gateway frame management. The experience feels instant and fluid.
+### Real-time streaming
+Every token arrives at the browser the moment the model generates it. There's no buffering layer, no Lambda invocation overhead per chunk, no API Gateway frame management.
 
-### Simpler Architecture
+### Simpler architecture
+As I mentioned earlier, I've done the traditional API Gateway WebSocket approach and the AppSync Events approach. Both work, but they have a lot of moving parts for what should be straightforward.
 
-The traditional approach requires:
-- An API Gateway WebSocket API with `$connect`, `$disconnect`, and `$default` routes
-- Lambda functions to manage connection IDs in DynamoDB
-- Another Lambda to post messages back via `@connections`
-- Complex error handling for disconnections and reconnections
-
-Our approach requires:
+With this approach all you need is:
 - One Lambda that generates a presigned URL
 - The browser's native WebSocket API
 - The agent itself
 
-That's it. The entire "real-time infrastructure" is a single Lambda function.
+The entire "real-time infrastructure" is a single Lambda function.
 
-### Lower Cost
-
+### Lower cost
 No Lambda invocations per streaming chunk. No DynamoDB reads/writes for connection management. No API Gateway WebSocket message charges. You pay for the AgentCore Runtime and one Lambda invocation per session establishment.
 
-### Persistent Connections
-
+### Persistent connections
 The WebSocket stays open for multi-turn conversations. The agent maintains state across messages within the same connection, no need to reload context on every request.
 
-## Adding Memory: Conversations That Persist
+## Adding memory
 
 A direct WebSocket connection is great, but what happens when the user closes their browser and comes back? Without memory, the agent starts fresh every time.
 
@@ -193,7 +191,7 @@ AgentCoreShortTermMemory:
 
 The memory ID is passed to the agent as an environment variable, no connection strings, no database provisioning, no schema management.
 
-## Adding Tools: Giving the Agent Capabilities
+## Adding tools
 
 An agent without tools is just a chatbot. Tools turn it into something that can actually do things.
 
@@ -233,11 +231,9 @@ if (event.current_tool_use?.name) {
 
 The user sees the agent "thinking," then using a tool, then formulating its response, all streaming in real-time. It feels like watching someone work, not waiting for an answer.
 
-## The Security Model
+## The security model
 
-"But wait, isn't it dangerous to let browsers connect directly to your AI agent?"
-
-Not when you layer the security correctly:
+You might be asking yourself, isn't it dangerous to let browsers connect directly to your AI agent? Not when you layer the security correctly:
 
 1. Cognito JWT validates the user's identity before any presigned URL is generated
 2. The Lambda's IAM role determines what AgentCore resources can be accessed, following least-privilege
@@ -256,7 +252,9 @@ user_id = headers.get("x-amzn-bedrock-agentcore-runtime-custom-user-id")
 
 The browser never sees AWS credentials. The Lambda's role does the signing. The user's identity is cryptographically bound to the connection.
 
-## The Complete Flow in 30 Seconds
+## The complete flow
+
+Let me quickly go over the full flow from start to finish:
 
 1. User logs in → gets Cognito JWT
 2. Frontend calls `POST /websocket/connect` with JWT
@@ -271,10 +269,9 @@ The browser never sees AWS credentials. The Lambda's role does the signing. The 
 
 No Lambda in the streaming path. No API Gateway managing frames. Just a browser talking to an agent.
 
-## When Should You Use This Pattern?
+## When to use this pattern
 
-This architecture works well when:
-
+This works well when:
 - Real-time streaming matters (chat interfaces, live collaboration, voice agents)
 - Multi-turn conversations are the norm (the persistent connection avoids repeated handshakes)
 - You want simplicity (fewer moving parts means fewer things that break at 2 AM)
@@ -287,7 +284,7 @@ It may not be the right fit when:
 
 For the non-streaming use case, WearCast also includes a traditional REST path through Step Functions, but honestly, once you've experienced the WebSocket approach, it's hard to go back.
 
-## Try It Yourself
+## Try it yourself
 
 WearCast is open source and deployable with a single `sam deploy`. The entire infrastructure (Cognito, API Gateway, Lambda, AgentCore Runtime, AgentCore Memory) is defined in one SAM template.
 
@@ -297,11 +294,13 @@ The key components:
 - `frontend/src/services/websocket.ts`: The browser-side WebSocket client
 - `backend/template.yaml`: The complete infrastructure definition
 
-The future of AI applications isn't request/response. It's persistent, streaming connections where the UI and the agent are in constant dialogue. Skip the middleman. Connect directly.
+## Wrap up
 
----
+I'm really happy with how this turned out. The WebSocket approach removed so much complexity from the architecture and the user experience is noticeably better with real-time streaming. I built this on the side but I've already used the same pattern for several projects at work. The fact that AgentCore handles the WebSocket connection management for us means we don't have to deal with any of the typical WebSocket infrastructure headaches.
 
-*Built with Amazon Bedrock AgentCore, Strands Agents SDK, and a healthy disregard for unnecessary infrastructure.*
+If you want to follow along, I have everything defined and deployable in [this GitHub repo](https://github.com/andmoredev/wearcast/).
+
+Let me know what you think about this approach!
 
 Until next time!
 
