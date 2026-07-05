@@ -2,15 +2,15 @@
 title = "Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebSocket"
 date = 2026-07-05T00:00:00-00:00
 draft = false
-description = "Learn how to connect your browser directly to an AI agent over WebSocket using AWS Bedrock AgentCore, skipping the traditional Lambda proxy and enabling real-time token streaming."
-tags = ["AWS", "Serverless", "Bedrock", "AgentCore", "WebSocket"]
+description = "Learn how to connect your browser directly to an AI agent over WebSocket using Amazon Bedrock AgentCore, skipping the traditional Lambda proxy and enabling real-time token streaming."
+tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore", "WebSocket"]
 [[images]]
   src = "img/websocket-direct-to-agent/title.png"
   alt = "Title image for Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebSocket"
   stretch = "stretchH"
 +++
 
-Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by AWS Bedrock AgentCore. The result: real-time streaming, lower latency, and a dramatically simpler data path, all without sacrificing security.
+Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by Amazon Bedrock AgentCore. The result: real-time streaming, lower latency, and a dramatically simpler data path, all without sacrificing security.
 
 ## The Problem with the Traditional Approach
 
@@ -301,7 +301,7 @@ The future of AI applications isn't request/response. It's persistent, streaming
 
 ---
 
-*Built with AWS Bedrock AgentCore, Strands Agents SDK, and a healthy disregard for unnecessary infrastructure.*
+*Built with Amazon Bedrock AgentCore, Strands Agents SDK, and a healthy disregard for unnecessary infrastructure.*
 
 Until next time!
 
