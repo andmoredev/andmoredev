@@ -2,7 +2,7 @@
 title = "Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebSocket"
 date = 2026-07-05T00:00:00-00:00
 draft = false
-description = "Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by AWS Bedrock AgentCore."
+description = "Learn how to connect your browser directly to an AI agent over WebSocket using AWS Bedrock AgentCore, skipping the traditional Lambda proxy and enabling real-time token streaming."
 tags = ["AWS", "Serverless", "Bedrock", "AgentCore", "WebSocket"]
 [[images]]
   src = "img/websocket-direct-to-agent/title.png"
