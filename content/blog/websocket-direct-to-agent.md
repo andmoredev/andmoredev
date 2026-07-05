@@ -10,7 +10,7 @@ tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore", "WebSocket"]
   stretch = "stretchH"
 +++
 
-Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by Amazon Bedrock AgentCore. The result: real-time streaming, lower latency, and a dramatically simpler data path, all without sacrificing security.
+Instead of routing every user message through REST APIs, Lambda functions, and back, what if your browser could talk directly to your AI agent over a persistent WebSocket connection? That's exactly what we built with WearCast, a weather-based clothing advisor powered by Amazon Bedrock AgentCore. The result: real-time streaming, lower latency, and a simpler data path without sacrificing security.
 
 ## The Problem with the Traditional Approach
 
@@ -24,7 +24,7 @@ Every message makes a round trip through multiple intermediaries. The response w
 
 Even if you add Server-Sent Events or long-polling, you're still stitching together a real-time experience on top of infrastructure that wasn't designed for it.
 
-**What if we just... skipped the middleman?**
+What if we just... skipped the middleman?
 
 ## The Architecture: Browser ↔ Agent, Direct Connection
 
@@ -45,9 +45,9 @@ Here's the core idea behind WearCast:
 └──────────────────────────────────┘     └──────────────────┘
 ```
 
-The browser connects **directly** to the AI agent over a WebSocket. No Lambda sits in the middle proxying tokens. No API Gateway WebSocket API managing connection state. The agent streams tokens directly to the user's browser as they're generated.
+The browser connects directly to the AI agent over a WebSocket. No Lambda sits in the middle proxying tokens. No API Gateway WebSocket API managing connection state. The agent streams tokens directly to the user's browser as they're generated.
 
-The only time we touch traditional infrastructure is during the **initial handshake**, where we exchange a JWT for a presigned URL. After that, it's a direct, bidirectional pipe.
+The only time we touch traditional infrastructure is during the initial handshake, where we exchange a JWT for a presigned URL. After that, it's a direct, bidirectional pipe.
 
 ## How It Works: The Three-Step Dance
 
@@ -70,7 +70,7 @@ const presignedData = await apiService.getPresignedWebSocketUrl(sessionId, acces
 
 Behind the scenes, a Lambda function:
 1. Validates the JWT (API Gateway's Cognito Authorizer handles this)
-2. Uses its IAM role to generate an **AWS SigV4 presigned WebSocket URL** pointing directly at the AgentCore Runtime
+2. Uses its IAM role to generate an AWS SigV4 presigned WebSocket URL pointing directly at the AgentCore Runtime
 3. Embeds the user's identity and session ID as query parameters in the signed URL
 4. Returns the presigned URL to the browser
 
@@ -94,7 +94,7 @@ The presigned URL is valid for 5 minutes, long enough to establish the connectio
 
 ### Step 3: Connect Directly to the Agent
 
-The browser opens a WebSocket connection using the presigned URL. **No custom headers needed**, all authentication is embedded in the URL's query parameters via SigV4.
+The browser opens a WebSocket connection using the presigned URL. No custom headers needed, all authentication is embedded in the URL's query parameters via SigV4.
 
 ```typescript
 this.ws = new WebSocket(presignedData.wsUrl);
@@ -155,7 +155,7 @@ The WebSocket stays open for multi-turn conversations. The agent maintains state
 
 A direct WebSocket connection is great, but what happens when the user closes their browser and comes back? Without memory, the agent starts fresh every time.
 
-WearCast uses **AgentCore Memory**, a managed service that persists conversation history across sessions:
+WearCast uses AgentCore Memory, a managed service that persists conversation history across sessions:
 
 ```python
 from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
@@ -175,7 +175,7 @@ def create_session_manager(runtime_session_id, user_id):
 
 When the agent initializes, the session manager automatically loads previous messages from memory. When the conversation ends, new messages are persisted. The user can close their laptop, come back hours later, and pick up right where they left off.
 
-The memory is scoped by **session ID** and **actor ID** (user), so each user's conversations are isolated and private.
+The memory is scoped by session ID and actor ID (user), so each user's conversations are isolated and private.
 
 ### Infrastructure-as-Code
 
@@ -195,7 +195,7 @@ The memory ID is passed to the agent as an environment variable, no connection s
 
 ## Adding Tools: Giving the Agent Capabilities
 
-An agent without tools is just a chatbot. Tools turn it into something that can take action in the real world.
+An agent without tools is just a chatbot. Tools turn it into something that can actually do things.
 
 WearCast includes a `get_weather` tool that fetches real forecast data from Open-Meteo (no API key required):
 
@@ -217,7 +217,7 @@ def get_weather(city: str, date: str = "today") -> dict:
     # ... fetch and return weather data ...
 ```
 
-The beauty of the Strands framework is that tools are just decorated Python functions. The `@tool` decorator handles:
+With Strands, tools are just decorated Python functions. The `@tool` decorator handles:
 - Generating the tool schema for the LLM
 - Parsing the LLM's tool-use requests
 - Executing the function and returning results to the model
@@ -239,11 +239,11 @@ The user sees the agent "thinking," then using a tool, then formulating its resp
 
 Not when you layer the security correctly:
 
-1. **Authentication**: Cognito JWT validates the user's identity before any presigned URL is generated
-2. **Authorization**: The Lambda's IAM role determines what AgentCore resources can be accessed, following least-privilege
-3. **Short-lived credentials**: Presigned URLs expire in 5 minutes, only valid long enough to establish the connection
-4. **User identity propagation**: The user's ID is embedded in the signed URL as a custom header, so the agent knows who it's talking to
-5. **SigV4 signing**: The connection URL is cryptographically signed, it can't be tampered with or reused
+1. Cognito JWT validates the user's identity before any presigned URL is generated
+2. The Lambda's IAM role determines what AgentCore resources can be accessed, following least-privilege
+3. Presigned URLs expire in 5 minutes, only valid long enough to establish the connection
+4. The user's ID is embedded in the signed URL as a custom header, so the agent knows who it's talking to
+5. The connection URL is cryptographically signed with SigV4, it can't be tampered with or reused
 
 ```javascript
 // User identity travels with the signed URL
@@ -273,12 +273,12 @@ No Lambda in the streaming path. No API Gateway managing frames. Just a browser 
 
 ## When Should You Use This Pattern?
 
-This architecture shines when:
+This architecture works well when:
 
-- **Real-time streaming matters**: chat interfaces, live collaboration, voice agents
-- **Multi-turn conversations are the norm**: the persistent connection avoids repeated handshakes
-- **You want simplicity**: fewer moving parts means fewer things that break at 2 AM
-- **Cost is a concern**: eliminating per-message Lambda invocations adds up fast
+- Real-time streaming matters (chat interfaces, live collaboration, voice agents)
+- Multi-turn conversations are the norm (the persistent connection avoids repeated handshakes)
+- You want simplicity (fewer moving parts means fewer things that break at 2 AM)
+- Cost is a concern (eliminating per-message Lambda invocations adds up fast)
 
 It may not be the right fit when:
 - You need complex request/response transformation before reaching the agent
@@ -292,10 +292,10 @@ For the non-streaming use case, WearCast also includes a traditional REST path t
 WearCast is open source and deployable with a single `sam deploy`. The entire infrastructure (Cognito, API Gateway, Lambda, AgentCore Runtime, AgentCore Memory) is defined in one SAM template.
 
 The key components:
-- **`backend/functions/websocket-connect.js`**: The presigned URL generator (the only "middleman")
-- **`backend/agents/agent/agent.py`**: The agent with WebSocket streaming, memory, and tools
-- **`frontend/src/services/websocket.ts`**: The browser-side WebSocket client
-- **`backend/template.yaml`**: The complete infrastructure definition
+- `backend/functions/websocket-connect.js`: The presigned URL generator (the only "middleman")
+- `backend/agents/agent/agent.py`: The agent with WebSocket streaming, memory, and tools
+- `frontend/src/services/websocket.ts`: The browser-side WebSocket client
+- `backend/template.yaml`: The complete infrastructure definition
 
 The future of AI applications isn't request/response. It's persistent, streaming connections where the UI and the agent are in constant dialogue. Skip the middleman. Connect directly.
 
