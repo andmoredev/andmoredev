@@ -10,6 +10,8 @@ tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore"]
   stretch = "stretchH"
 +++
 
+> *Este artículo fue traducido usando IA.*
+
 He estado construyendo agentes de IA desde hace un tiempo, y transmitir las respuestas a una UI siempre ha sido la parte más complicada. En proyectos anteriores probé streaming con API Gateway, streaming de respuestas con Lambda, e incluso AppSync Events a través de una herramienta del agente para notificar a la UI. También consideré agregar mi propio WebSocket API a través de API Gateway, lo cual requiere administrar las rutas `$connect`, `$disconnect` y `$default`, almacenar los IDs de conexión en DynamoDB y enviar mensajes de vuelta a través de `@connections`. Todos estos enfoques se sentían como demasiada ceremonia para algo que debería ser simple.
 
 Fue entonces cuando descubrí que AgentCore tiene soporte integrado para WebSocket. El navegador simplemente se conecta directamente al agente. Sin intermediarios.
