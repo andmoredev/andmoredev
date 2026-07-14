@@ -1,6 +1,6 @@
 +++
 title = "Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebSocket"
-date = 2026-07-05T00:00:00-00:00
+date = 2026-07-13T00:00:00-00:00
 draft = false
 description = "Learn how to connect your browser directly to an AI agent over WebSocket using Amazon Bedrock AgentCore, skipping the traditional Lambda proxy and enabling real-time token streaming."
 tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore", "WebSocket"]
@@ -38,10 +38,10 @@ Here's what I ended up with:
        │  WebSocket (SigV4 presigned URL)
        │  ← No middleman! Direct connection →
        ▼
-┌──────────────────────────────────┐     ┌──────────────────┐
-│  AgentCore Runtime               │────▶│  AgentCore Memory│
-│  (Strands Agent + Bedrock LLM)   │     │  (Persistence)   │
-└──────────────────────────────────┘     └──────────────────┘
+┌──────────────────────────────────┐     ┌────────────────────┐
+│  AgentCore Runtime               │────▶│  AgentCore Memory  │
+│  (Strands Agent + Bedrock LLM)   │     │  (Persistence)     │
+└──────────────────────────────────┘     └────────────────────┘
 ```
 
 The browser connects directly to the AI agent over a WebSocket without the need for any Lambda functions to proxy the tokens. The agent streams tokens directly to the user's browser as they're generated.
