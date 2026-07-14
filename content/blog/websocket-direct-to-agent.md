@@ -14,6 +14,8 @@ I've been building AI agents for a while now, and streaming responses to a UI ha
 
 That's when I found that AgentCore has built-in WebSocket support. The browser can just connect directly to the agent. No middleman.
 
+I built WearCast to demonstrate this functionality. This is an AI agent that helps you pick out what to where based on the weather. I've found this very helpfu when packing for a trip. The code for this application is public and you can find the full implementation on [this GitHub repo](https://github.com/andmoredev/wearcast/).
+
 ## The problem with the traditional approach
 
 We usually build app applications as we do REST APIs
@@ -277,8 +279,6 @@ It may not be the right fit when:
 
 
 ## Try it yourself
-
-WearCast is public and deployable with a single `sam deploy` in [this GitHub repo](https://github.com/andmoredev/wearcast/).
 
 The key components:
 - `backend/functions/websocket-connect.js`: The presigned URL generator (the only "middleman")
