@@ -278,7 +278,7 @@ It may not be the right fit when:
 
 ## Try it yourself
 
-WearCast is public and deployable with a single `sam deploy`. The entire infrastructure (Cognito, API Gateway, Lambda, AgentCore Runtime, AgentCore Memory) is defined in one SAM template.
+WearCast is public and deployable with a single `sam deploy` in [this GitHub repo](https://github.com/andmoredev/wearcast/).
 
 The key components:
 - `backend/functions/websocket-connect.js`: The presigned URL generator (the only "middleman")
@@ -290,9 +290,6 @@ The key components:
 
 I'm really happy with how this turned out. The WebSocket approach removed so much complexity from the architecture and the user experience is noticeably better with real-time streaming. I built this on the side but I've already used the same pattern for several projects at work. The fact that AgentCore handles the WebSocket connection management for us means we don't have to deal with any of the typical WebSocket infrastructure headaches.
 
-If you want to try it out yourself, I have everything defined and deployable in [this GitHub repo](https://github.com/andmoredev/wearcast/).
-
 Let me know what you think about this approach!
-
 
 Andres Moreno
