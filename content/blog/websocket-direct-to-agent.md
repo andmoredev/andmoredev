@@ -3,7 +3,7 @@ title = "Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebS
 date = 2026-07-13T00:00:00-00:00
 draft = false
 description = "Learn how to connect your browser directly to an AI agent over WebSocket using Amazon Bedrock AgentCore, skipping the traditional Lambda proxy and enabling real-time token streaming."
-tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore", "WebSocket"]
+tags = ["AWS", "Serverless", "Amazon Bedrock", "AgentCore"]
 [[images]]
   src = "img/websocket-direct-to-agent/title.png"
   alt = "Title image for Skip the Middleman: Connecting Your UI Directly to an AI Agent via WebSocket"
